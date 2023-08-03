@@ -49,13 +49,13 @@ All requests are made towards: https://api.oneprovider.com/
 
 ### Mandatory datasources
 
-[] Datasource to list available OSes (templates): GET /vm/templates
+[ ] Datasource to list available OSes (templates): GET /vm/templates
 
-[] Datasource to list available locations: GET /vm/locations
+[ ] Datasource to list available locations: GET /vm/locations
 
 ### Mandatory resources
 
-[] Resource to create a VM: POST /vm/create
+[ ] Resource to create a VM: POST /vm/create
 ```text
 location_id	        Integer	Virtual server's location ID.
 instance_size	        Integer	Instance's size ID. [A list of available sizes can be returned with the /vm/sizes/ call]
@@ -64,7 +64,7 @@ hostname	        String	New hostname of the server/VM
 sshKeys (optional)	Array	SSH Keys
 ```
 
-[] Resource to delete a VM: POST /vm/destroy
+[ ] Resource to delete a VM: POST /vm/destroy
 ```text
 vm_id	        Integer	Virtual server ID
 confirm_close	Boolean	Parameter to confirm you want to pay the bandwidth overage
