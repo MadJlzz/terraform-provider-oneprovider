@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -35,8 +36,9 @@ func (p *OneProvider) Metadata(ctx context.Context, req provider.MetadataRequest
 func (p *OneProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Example provider attribute",
+			"api_key": schema.StringAttribute{
+				MarkdownDescription: "API key required by OneProvider to run authenticated requests",
+				Sensitive:           true,
 				Optional:            true,
 			},
 		},
@@ -51,6 +53,8 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	tflog.Info(ctx, "hello there")
 
 	// Configuration values are now available.
 	// if data.Endpoint.IsNull() { /* ... */ }
