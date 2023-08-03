@@ -45,7 +45,30 @@ Then commit the changes to `go.mod` and `go.sum`.
 
 ## Using the provider
 
-Fill this in for each provider
+All requests are made towards: https://api.oneprovider.com/
+
+### Mandatory datasources
+
+[] Datasource to list available OSes (templates): GET /vm/templates
+
+[] Datasource to list available locations: GET /vm/locations
+
+### Mandatory resources
+
+[] Resource to create a VM: POST /vm/create
+```text
+location_id	        Integer	Virtual server's location ID.
+instance_size	        Integer	Instance's size ID. [A list of available sizes can be returned with the /vm/sizes/ call]
+template	        String	ID of the OS' template or the UUID of the image to install [A list of available templates can be returned with the /vm/templates call and images with /vm/images/list]
+hostname	        String	New hostname of the server/VM
+sshKeys (optional)	Array	SSH Keys
+```
+
+[] Resource to delete a VM: POST /vm/destroy
+```text
+vm_id	        Integer	Virtual server ID
+confirm_close	Boolean	Parameter to confirm you want to pay the bandwidth overage
+```
 
 ## Developing the Provider
 
