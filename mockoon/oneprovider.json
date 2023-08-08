@@ -1,0 +1,178 @@
+{
+  "uuid": "c7b97b41-2781-4251-ad38-f3a97a77b278",
+  "lastMigration": 28,
+  "name": "OneProvider",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 3000,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "85eb18f6-ecbe-4b64-ae3e-6c1ffed5dcaf",
+      "type": "http",
+      "documentation": "Returns a list of the available OS",
+      "method": "get",
+      "endpoint": "vm/templates",
+      "responses": [
+        {
+          "uuid": "6ddb96a5-4d8d-431f-b446-b3cd079f76c1",
+          "body": "{\n  \"result\": \"success\",\n  \"response\": [\n    {\n      \"id\": 771,\n      \"name\": \"Debian 9.4 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"debian\",\n        \"display\": \"Debian 9.4 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 800,\n      \"name\": \"Scientific Linux 7.4 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"scientific\",\n        \"display\": \"Scientific Linux 7.4 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 812,\n      \"name\": \"Ubuntu 18.04 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"ubuntu\",\n        \"display\": \"Ubuntu 18.04 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 878,\n      \"name\": \"Debian 10 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"debian\",\n        \"display\": \"Debian 10 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 909,\n      \"name\": \"Ubuntu 20.04 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"ubuntu\",\n        \"display\": \"Ubuntu 20.04 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 929,\n      \"name\": \"Suse 15.1 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"suse\",\n        \"display\": \"Suse 15.1 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 934,\n      \"name\": \"Webuzo\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"Webuzo\",\n        \"display\": \"Webuzo\",\n        \"description\": \"Webuzo is a LAMP STACK and a Single User Control Panel, it simplifies the development and deployment of your project by supporting more than 400 applications and 1115 classes. \",\n        \"oca\": 1\n      }\n    },\n    {\n      \"id\": 961,\n      \"name\": \"CentOS 7.9 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"centos\",\n        \"display\": \"CentOS 7.9 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 979,\n      \"name\": \"Debian 11 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"debian\",\n        \"display\": \"Debian 11 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 995,\n      \"name\": \"Fedora 34 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"fedora\",\n        \"display\": \"Fedora 34 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1012,\n      \"name\": \"AlmaLinux 8.6 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"almalinux\",\n        \"display\": \"AlmaLinux 8.6 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1017,\n      \"name\": \"Ubuntu 22.04 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"ubuntu\",\n        \"display\": \"Ubuntu 22.04 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1018,\n      \"name\": \"AlmaLinux 9.0 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"almalinux\",\n        \"display\": \"AlmaLinux 9.0 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1025,\n      \"name\": \"Oracle Linux 8.6 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"oracle\",\n        \"display\": \"Oracle Linux 8.6 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1028,\n      \"name\": \"Rocky Linux 8.6 86_64\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"rocky\",\n        \"display\": \"Rocky Linux 8.6 86_64\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1042,\n      \"name\": \"Rocky Linux 9.1 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"rocky\",\n        \"display\": \"Rocky Linux 9.1 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 1055,\n      \"name\": \"Debian 12 64bits\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"debian\",\n        \"display\": \"Debian 12 64bits\",\n        \"description\": \"\",\n        \"oca\": 0\n      }\n    },\n    {\n      \"id\": 100008,\n      \"name\": \"Docker\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"docker\",\n        \"display\": \"Docker\",\n        \"description\": \"Achieve agility and control for Development and IT Operations teams to build, ship, and run any app, anywhere. It will install the latest version of Docker.\",\n        \"oca\": 1\n      }\n    },\n    {\n      \"id\": 100013,\n      \"name\": \"OpenVPN\",\n      \"size\": \"5368709120\",\n      \"display\": {\n        \"name\": \"openvpn\",\n        \"display\": \"OpenVPN\",\n        \"description\": \"Whether your want to go incognito or simply browse the web from somewhere else, just deploy OpenVPN on your OneCloud VM and you're good to go.\",\n        \"oca\": 1\n      }\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "489631ab-88de-4687-923b-908485825c16",
+      "type": "http",
+      "documentation": "Get a list of the available locations",
+      "method": "get",
+      "endpoint": "vm/locations",
+      "responses": [
+        {
+          "uuid": "154073cd-74af-4645-945a-7b63cc66248d",
+          "body": "{\n  \"result\": \"success\",\n  \"response\": {\n    \"North America\": [\n      {\n        \"id\": \"19\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Atlanta\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n        ]\n      },\n      {\n        \"id\": \"4\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Chicago\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"21\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Dallas\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"103\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Kansas City\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          67,\n          68,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"71\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Los Angeles\",\n        \"available_types\": [\n          \"Storage\",\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          63,\n          65,\n          66,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"15\",\n        \"region\": \"North America\",\n        \"country\": \"MX\",\n        \"city\": \"Mexico City\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"48\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Miami\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"3\",\n        \"region\": \"North America\",\n        \"country\": \"CA\",\n        \"city\": \"Montreal\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"Storage\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          63,\n          65,\n          66,\n          67,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"11\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"New York\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"60\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Portland\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"84\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Salt Lake City\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"95\",\n        \"region\": \"North America\",\n        \"country\": \"PR\",\n        \"city\": \"San Juan\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56\n        ]\n      },\n      {\n        \"id\": \"32\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Seattle\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"18\",\n        \"region\": \"North America\",\n        \"country\": \"CA\",\n        \"city\": \"Vancouver\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"46\",\n        \"region\": \"North America\",\n        \"country\": \"US\",\n        \"city\": \"Washington\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      }\n    ],\n    \"Europe\": [\n      {\n        \"id\": \"59\",\n        \"region\": \"Europe\",\n        \"country\": \"NL\",\n        \"city\": \"Amsterdam\",\n        \"available_types\": [\n          \"Storage\",\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          68,\n          71\n        ]\n      },\n      {\n        \"id\": \"73\",\n        \"region\": \"Europe\",\n        \"country\": \"GR\",\n        \"city\": \"Athens\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"81\",\n        \"region\": \"Europe\",\n        \"country\": \"RS\",\n        \"city\": \"Belgrade\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"35\",\n        \"region\": \"Europe\",\n        \"country\": \"BE\",\n        \"city\": \"Brussels\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"30\",\n        \"region\": \"Europe\",\n        \"country\": \"RO\",\n        \"city\": \"Bucharest\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"31\",\n        \"region\": \"Europe\",\n        \"country\": \"IE\",\n        \"city\": \"Dublin\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"50\",\n        \"region\": \"Europe\",\n        \"country\": \"DE\",\n        \"city\": \"Dusseldorf\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          67,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"97\",\n        \"region\": \"Europe\",\n        \"country\": \"IT\",\n        \"city\": \"Florence\",\n        \"available_types\": [\n          \"High performance\",\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          67,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"55\",\n        \"region\": \"Europe\",\n        \"country\": \"DE\",\n        \"city\": \"Frankfurt\",\n        \"available_types\": [\n          \"Storage\"\n        ],\n        \"available_sizes\": [\n          57,\n          58,\n          59,\n          60\n        ]\n      },\n      {\n        \"id\": \"65\",\n        \"region\": \"Europe\",\n        \"country\": \"FI\",\n        \"city\": \"Helsinki\",\n        \"available_types\": [\n          \"Storage\",\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          63,\n          65,\n          66,\n          67,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"66\",\n        \"region\": \"Europe\",\n        \"country\": \"UA\",\n        \"city\": \"Kyiv\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"69\",\n        \"region\": \"Europe\",\n        \"country\": \"PT\",\n        \"city\": \"Lisbon\",\n        \"available_types\": [\n          \"Storage\",\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"52\",\n        \"region\": \"Europe\",\n        \"country\": \"UK\",\n        \"city\": \"London\",\n        \"available_types\": [\n          \"Storage\",\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          63,\n          65,\n          66,\n          67,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"105\",\n        \"region\": \"Europe\",\n        \"country\": \"LU\",\n        \"city\": \"Luxembourg\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"43\",\n        \"region\": \"Europe\",\n        \"country\": \"ES\",\n        \"city\": \"Madrid\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"28\",\n        \"region\": \"Europe\",\n        \"country\": \"RU\",\n        \"city\": \"Moscow\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"85\",\n        \"region\": \"Europe\",\n        \"country\": \"CY\",\n        \"city\": \"Nicosia\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"22\",\n        \"region\": \"Europe\",\n        \"country\": \"NO\",\n        \"city\": \"Oslo\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"Storage\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          63,\n          65,\n          66,\n          67,\n          68,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"75\",\n        \"region\": \"Europe\",\n        \"country\": \"FR\",\n        \"city\": \"Paris\",\n        \"available_types\": [\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          63,\n          65,\n          66,\n          67,\n          68\n        ]\n      },\n      {\n        \"id\": \"37\",\n        \"region\": \"Europe\",\n        \"country\": \"BG\",\n        \"city\": \"Sofia\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"26\",\n        \"region\": \"Europe\",\n        \"country\": \"SE\",\n        \"city\": \"Stockholm\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"29\",\n        \"region\": \"Europe\",\n        \"country\": \"AT\",\n        \"city\": \"Vienna\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"36\",\n        \"region\": \"Europe\",\n        \"country\": \"LT\",\n        \"city\": \"Vilnius\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"45\",\n        \"region\": \"Europe\",\n        \"country\": \"PL\",\n        \"city\": \"Warsaw\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"Storage\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"25\",\n        \"region\": \"Europe\",\n        \"country\": \"CH\",\n        \"city\": \"Zurich\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      }\n    ],\n    \"Asia\": [\n      {\n        \"id\": \"33\",\n        \"region\": \"Asia\",\n        \"country\": \"TR\",\n        \"city\": \"Bursa\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56\n        ]\n      },\n      {\n        \"id\": \"49\",\n        \"region\": \"Asia\",\n        \"country\": \"AE\",\n        \"city\": \"Dubai\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"13\",\n        \"region\": \"Asia\",\n        \"country\": \"HK\",\n        \"city\": \"Hong Kong\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          68\n        ]\n      },\n      {\n        \"id\": \"72\",\n        \"region\": \"Asia\",\n        \"country\": \"MY\",\n        \"city\": \"Kuala Lumpur\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56\n        ]\n      },\n      {\n        \"id\": \"98\",\n        \"region\": \"Asia\",\n        \"country\": \"IN\",\n        \"city\": \"Mumbai\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"6\",\n        \"region\": \"Asia\",\n        \"country\": \"SG\",\n        \"city\": \"Singapore\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"Storage\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"90\",\n        \"region\": \"Asia\",\n        \"country\": \"TW\",\n        \"city\": \"Taipei\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56\n        ]\n      },\n      {\n        \"id\": \"68\",\n        \"region\": \"Asia\",\n        \"country\": \"IL\",\n        \"city\": \"Tel Aviv\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"Storage\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          57,\n          58,\n          59,\n          60,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"14\",\n        \"region\": \"Asia\",\n        \"country\": \"JP\",\n        \"city\": \"Tokyo\",\n        \"available_types\": [\n          \"General Purpose\",\n          \"High performance\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          68,\n          70,\n          71\n        ]\n      }\n    ],\n    \"Oceania\": [\n      {\n        \"id\": \"44\",\n        \"region\": \"Oceania\",\n        \"country\": \"AU\",\n        \"city\": \"Sydney\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      }\n    ],\n    \"South America\": [\n      {\n        \"id\": \"87\",\n        \"region\": \"South America\",\n        \"country\": \"CO\",\n        \"city\": \"Bogota\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"86\",\n        \"region\": \"South America\",\n        \"country\": \"AR\",\n        \"city\": \"Buenos Aires\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56\n        ]\n      },\n      {\n        \"id\": \"94\",\n        \"region\": \"South America\",\n        \"country\": \"GT\",\n        \"city\": \"Guatemala City\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"92\",\n        \"region\": \"South America\",\n        \"country\": \"PE\",\n        \"city\": \"Lima\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"93\",\n        \"region\": \"South America\",\n        \"country\": \"EC\",\n        \"city\": \"Quito\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      },\n      {\n        \"id\": \"64\",\n        \"region\": \"South America\",\n        \"country\": \"CL\",\n        \"city\": \"Santiago\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56\n        ]\n      },\n      {\n        \"id\": \"106\",\n        \"region\": \"South America\",\n        \"country\": \"BR\",\n        \"city\": \"Sao Paulo\",\n        \"available_types\": [\n          \"High performance\",\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          63,\n          65,\n          66,\n          68\n        ]\n      }\n    ],\n    \"Africa\": [\n      {\n        \"id\": \"9\",\n        \"region\": \"Africa\",\n        \"country\": \"ZA\",\n        \"city\": \"Johannesburg\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          69,\n          70,\n          71\n        ]\n      },\n      {\n        \"id\": \"77\",\n        \"region\": \"Africa\",\n        \"country\": \"NG\",\n        \"city\": \"Lagos\",\n        \"available_types\": [\n          \"General Purpose\"\n        ],\n        \"available_sizes\": [\n          45,\n          46,\n          47,\n          48,\n          54,\n          55,\n          56,\n          71\n        ]\n      }\n    ]\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "dc874129-6124-4f45-bc6e-4f39349af959",
+      "type": "http",
+      "documentation": "Create a virtual server",
+      "method": "post",
+      "endpoint": "vm/create",
+      "responses": [
+        {
+          "uuid": "33d90577-503e-49e9-87a7-8d591dac04e5",
+          "body": "{\n  \"result\": \"success\",\n  \"response\": {\n    \"message\": \"Virtual server created\",\n    \"id\": 1,\n    \"ip_address\": \"1.1.1.1\",\n    \"hostname\": \"test.com\",\n    \"password\": \"fAk3Passw0Rd\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "eec4506b-8ef9-47cb-88eb-a7e77fad7183",
+      "type": "http",
+      "documentation": "Destroy virtual server",
+      "method": "post",
+      "endpoint": "vm/destroy",
+      "responses": [
+        {
+          "uuid": "ba58d18b-3a8a-4989-9e53-c5d50b784a60",
+          "body": "{\n  \"result\": \"success\",\n  \"response\": {\n    \"message\": \"Virtual server destroyed\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "85eb18f6-ecbe-4b64-ae3e-6c1ffed5dcaf"
+    },
+    {
+      "type": "route",
+      "uuid": "489631ab-88de-4687-923b-908485825c16"
+    },
+    {
+      "type": "route",
+      "uuid": "dc874129-6124-4f45-bc6e-4f39349af959"
+    },
+    {
+      "type": "route",
+      "uuid": "eec4506b-8ef9-47cb-88eb-a7e77fad7183"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": []
+}
