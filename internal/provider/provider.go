@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"github.com/MadJlzz/terraform-provider-oneprovider/internal/datasources"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"net/http"
 
@@ -9,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure OneProvider satisfies various provider interfaces.
@@ -25,7 +26,9 @@ type OneProvider struct {
 
 // OneProviderModel describes the provider data model.
 type OneProviderModel struct {
-	Endpoint types.String `tfsdk:"endpoint"`
+	Host      types.String `tfsdk:"host"`
+	ClientKey types.String `tfsdk:"client_key"`
+	ApiKey    types.String `tfsdk:"api_key"`
 }
 
 func (p *OneProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -36,44 +39,62 @@ func (p *OneProvider) Metadata(ctx context.Context, req provider.MetadataRequest
 func (p *OneProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"api_key": schema.StringAttribute{
-				MarkdownDescription: "API key required by OneProvider to run authenticated requests",
-				Sensitive:           true,
+			"host": schema.StringAttribute{
 				Optional:            true,
+				MarkdownDescription: "The host to which requests will be sent to. Defaults to api.oneprovider.com",
+			},
+			"client_key": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Client key required by OneProvider to run authenticated requests",
+			},
+			"api_key": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "API key required by OneProvider to run authenticated requests",
 			},
 		},
 	}
 }
 
 func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var data OneProviderModel
+	tflog.Info(ctx, "Configuring OneProvider client")
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
+	var providerConfiguration OneProviderModel
+	resp.Diagnostics.Append(req.Config.Get(ctx, &providerConfiguration)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	tflog.Info(ctx, "hello there")
-
 	// Configuration values are now available.
+	//if providerConfiguration.Host.IsUnknown() {
+	//	resp.Diagnostics.AddAttributeError(
+	//		path.Root("host"),
+	//		"test",
+	//		"etst",
+	//	)
+	//}
+
+	//if resp.Diagnostics.HasError() {
+	//	return
+	//}
+
 	// if data.Endpoint.IsNull() { /* ... */ }
 
 	// Example client configuration for data sources and resources
+	// TODO: create a OneProvider HTTP client
 	client := http.DefaultClient
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
 
 func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource{
-		//NewExampleResource,
-	}
+	return []func() resource.Resource{}
 }
 
 func (p *OneProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		//NewExampleDataSource,
+		datasources.NewVmTemplatesDataSource,
 	}
 }
 
