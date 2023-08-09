@@ -25,4 +25,4 @@ provider "oneprovider" {
 
 - `api_key` (String, Sensitive) API key required by OneProvider to run authenticated requests
 - `client_key` (String, Sensitive) Client key required by OneProvider to run authenticated requests
-- `host` (String) The host to which requests will be sent to. Defaults to api.oneprovider.com
+- `endpoint` (String) The host to which requests will be sent to. Defaults to api.oneprovider.com

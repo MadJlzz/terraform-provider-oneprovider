@@ -7,6 +7,7 @@ terraform {
 }
 
 provider "oneprovider" {
+  endpoint   = "http://localhost:3000"
   api_key    = "fakeApiKey"
   client_key = "fakeClientKey"
 }

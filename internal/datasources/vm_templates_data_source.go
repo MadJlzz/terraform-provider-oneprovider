@@ -84,11 +84,20 @@ func (d *VmTemplatesDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	// For the purposes of this example code, hardcoding a response value to
 	// save into the Terraform state.
-	data.Id = types.StringValue("example-id")
+	// data.Id = types.StringValue("example-id")
 
+	templates, err := d.svc.ListTemplates(ctx)
+	if err != nil {
+		resp.Diagnostics.AddError("client error", fmt.Sprintf("Unable to read templates, got error: %s", err))
+	}
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Info(ctx, "read a data source")
+
+	//types.ListValue(oneprovider.ListTemplatesResponse, templates)
+	//data.Templates = templates
+
+	tflog.Info(ctx, fmt.Sprintf("%v", templates))
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

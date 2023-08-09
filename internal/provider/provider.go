@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	DefaultHostname = "api.oneprovider.com"
 	ApiKeyEnvVar    = "ONEPROVIDER_API_KEY"
 	ClientKeyEnvVar = "ONEPROVIDER_CLIENT_KEY"
+	DefaultEndpoint = "https://api.oneprovider.com"
 )
 
 // Ensure OneProvider satisfies various provider interfaces.
@@ -34,9 +34,9 @@ type OneProvider struct {
 
 // OneProviderModel describes the provider data model.
 type OneProviderModel struct {
-	Host      types.String `tfsdk:"host"`
-	ClientKey types.String `tfsdk:"client_key"`
 	ApiKey    types.String `tfsdk:"api_key"`
+	ClientKey types.String `tfsdk:"client_key"`
+	Endpoint  types.String `tfsdk:"endpoint"`
 }
 
 func (p *OneProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -47,10 +47,6 @@ func (p *OneProvider) Metadata(ctx context.Context, req provider.MetadataRequest
 func (p *OneProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"host": schema.StringAttribute{
-				Optional:            true,
-				MarkdownDescription: "The host to which requests will be sent to. Defaults to api.oneprovider.com",
-			},
 			"api_key": schema.StringAttribute{
 				Optional:            true,
 				Sensitive:           true,
@@ -60,6 +56,10 @@ func (p *OneProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 				Optional:            true,
 				Sensitive:           true,
 				MarkdownDescription: "Client key required by OneProvider to run authenticated requests",
+			},
+			"endpoint": schema.StringAttribute{
+				Optional:            true,
+				MarkdownDescription: "The host to which requests will be sent to. Defaults to api.oneprovider.com",
 			},
 		},
 	}
@@ -74,9 +74,9 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	host := DefaultHostname
-	if !providerConfiguration.Host.IsNull() {
-		host = providerConfiguration.Host.ValueString()
+	endpoint := DefaultEndpoint
+	if !providerConfiguration.Endpoint.IsNull() {
+		endpoint = providerConfiguration.Endpoint.ValueString()
 	}
 
 	apiKey := os.Getenv(ApiKeyEnvVar)
@@ -89,11 +89,11 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		clientKey = providerConfiguration.ClientKey.ValueString()
 	}
 
-	if host == "" {
+	if endpoint == "" {
 		resp.Diagnostics.AddAttributeError(
-			path.Root("host"),
-			"Missing OneProvider API host",
-			"Missing or empty value for host property. Cannot create OneProvider API client. Set the host value in the configuration.",
+			path.Root("endpoint"),
+			"Missing OneProvider API endpoint",
+			"Missing or empty value for endpoint property. Cannot create OneProvider API client. Set the endpoint value in the configuration.",
 		)
 	}
 
@@ -117,7 +117,7 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	svc, err := oneprovider.NewService(host, clientKey, apiKey)
+	svc, err := oneprovider.NewService(endpoint, clientKey, apiKey)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create OneProvider API client",
