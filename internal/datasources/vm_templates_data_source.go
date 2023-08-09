@@ -3,11 +3,11 @@ package datasources
 import (
 	"context"
 	"fmt"
+	"github.com/MadJlzz/terraform-provider-oneprovider/internal/oneprovider"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"net/http"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -19,13 +19,12 @@ func NewVmTemplatesDataSource() datasource.DataSource {
 
 // VmTemplatesDataSource defines the data source implementation.
 type VmTemplatesDataSource struct {
-	client *http.Client
+	svc oneprovider.API
 }
 
 // VmTemplatesDataSourceModel describes the data source data model.
 type VmTemplatesDataSourceModel struct {
-	ConfigurableAttribute types.String `tfsdk:"configurable_attribute"`
-	Id                    types.String `tfsdk:"id"`
+	Id types.String `tfsdk:"id"`
 }
 
 func (d *VmTemplatesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -38,10 +37,6 @@ func (d *VmTemplatesDataSource) Schema(ctx context.Context, req datasource.Schem
 		MarkdownDescription: "Example data source",
 
 		Attributes: map[string]schema.Attribute{
-			"configurable_attribute": schema.StringAttribute{
-				MarkdownDescription: "Example configurable attribute",
-				Optional:            true,
-			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Example identifier",
 				Computed:            true,
@@ -56,7 +51,7 @@ func (d *VmTemplatesDataSource) Configure(ctx context.Context, req datasource.Co
 		return
 	}
 
-	client, ok := req.ProviderData.(*http.Client)
+	svc, ok := req.ProviderData.(oneprovider.API)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
@@ -66,7 +61,7 @@ func (d *VmTemplatesDataSource) Configure(ctx context.Context, req datasource.Co
 		return
 	}
 
-	d.client = client
+	d.svc = svc
 }
 
 func (d *VmTemplatesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

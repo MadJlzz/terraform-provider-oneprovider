@@ -3,14 +3,22 @@ package provider
 import (
 	"context"
 	"github.com/MadJlzz/terraform-provider-oneprovider/internal/datasources"
+	"github.com/MadJlzz/terraform-provider-oneprovider/internal/oneprovider"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"net/http"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+)
+
+const (
+	DefaultHostname = "api.oneprovider.com"
+	ApiKeyEnvVar    = "ONEPROVIDER_API_KEY"
+	ClientKeyEnvVar = "ONEPROVIDER_CLIENT_KEY"
 )
 
 // Ensure OneProvider satisfies various provider interfaces.
@@ -43,15 +51,15 @@ func (p *OneProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 				Optional:            true,
 				MarkdownDescription: "The host to which requests will be sent to. Defaults to api.oneprovider.com",
 			},
-			"client_key": schema.StringAttribute{
-				Optional:            true,
-				Sensitive:           true,
-				MarkdownDescription: "Client key required by OneProvider to run authenticated requests",
-			},
 			"api_key": schema.StringAttribute{
 				Optional:            true,
 				Sensitive:           true,
 				MarkdownDescription: "API key required by OneProvider to run authenticated requests",
+			},
+			"client_key": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Client key required by OneProvider to run authenticated requests",
 			},
 		},
 	}
@@ -66,26 +74,61 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	// Configuration values are now available.
-	//if providerConfiguration.Host.IsUnknown() {
-	//	resp.Diagnostics.AddAttributeError(
-	//		path.Root("host"),
-	//		"test",
-	//		"etst",
-	//	)
-	//}
+	host := DefaultHostname
+	if !providerConfiguration.Host.IsNull() {
+		host = providerConfiguration.Host.ValueString()
+	}
 
-	//if resp.Diagnostics.HasError() {
-	//	return
-	//}
+	apiKey := os.Getenv(ApiKeyEnvVar)
+	if !providerConfiguration.ApiKey.IsNull() {
+		apiKey = providerConfiguration.ApiKey.ValueString()
+	}
 
-	// if data.Endpoint.IsNull() { /* ... */ }
+	clientKey := os.Getenv(ClientKeyEnvVar)
+	if !providerConfiguration.ClientKey.IsNull() {
+		clientKey = providerConfiguration.ClientKey.ValueString()
+	}
 
-	// Example client configuration for data sources and resources
-	// TODO: create a OneProvider HTTP client
-	client := http.DefaultClient
-	resp.DataSourceData = client
-	resp.ResourceData = client
+	if host == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("host"),
+			"Missing OneProvider API host",
+			"Missing or empty value for host property. Cannot create OneProvider API client. Set the host value in the configuration.",
+		)
+	}
+
+	if clientKey == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("client_key"),
+			"Missing OneProvider API client key",
+			"Missing or empty value for client key property. Cannot create OneProvider API client. Set the client key value in the configuration or use the "+ClientKeyEnvVar+" environment variable.",
+		)
+	}
+
+	if apiKey == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("api_key"),
+			"Missing OneProvider API api key",
+			"Missing or empty value for api key property. Cannot create OneProvider API client. Set the api key value in the configuration or use the "+ApiKeyEnvVar+" environment variable.",
+		)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	svc, err := oneprovider.NewService(host, clientKey, apiKey)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to create OneProvider API client",
+			"An unexpected error occurred when creating the OneProvider API client. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"OneProvider client error: "+err.Error(),
+		)
+		return
+	}
+	resp.DataSourceData = svc
+	resp.ResourceData = svc
 }
 
 func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource {

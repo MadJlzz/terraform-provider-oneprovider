@@ -7,11 +7,8 @@ terraform {
 }
 
 provider "oneprovider" {
-  host = "test"
+  api_key    = "fakeApiKey"
+  client_key = "fakeClientKey"
 }
 
 data "oneprovider_example" "example" {}
-
-output "test" {
-  value = data.oneprovider_example.example.id
-}
