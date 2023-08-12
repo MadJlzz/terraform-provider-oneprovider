@@ -1,37 +1,17 @@
+![](./assets/logo.png)
+
 # Terraform Provider OneProvider
 
-## Requirements
+Terraform provider for OneProvider. Provider documentation is available [here]().
+
+## Contribute
+
+### Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.20
 
-## Using the provider
-
-All requests are made towards: https://api.oneprovider.com/
-
-### Mandatory datasources
-
-- [ ] Datasource to list available OSes (templates): GET /vm/templates
-- [ ] Datasource to list available locations: GET /vm/locations
-
-### Mandatory resources
-
-- [ ] Resource to create a VM: POST /vm/create
-```text
-location_id	        Integer	Virtual server's location ID.
-instance_size	        Integer	Instance's size ID. [A list of available sizes can be returned with the /vm/sizes/ call]
-template	        String	ID of the OS' template or the UUID of the image to install [A list of available templates can be returned with the /vm/templates call and images with /vm/images/list]
-hostname	        String	New hostname of the server/VM
-sshKeys (optional)	Array	SSH Keys
-```
-
-- [ ] Resource to delete a VM: POST /vm/destroy
-```text
-vm_id	        Integer	Virtual server ID
-confirm_close	Boolean	Parameter to confirm you want to pay the bandwidth overage
-```
-
-## Developing the provider
+### Developing the provider
 
 If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
 
@@ -48,7 +28,7 @@ make testacc
 ```
 
 If you want to test your provider locally first, you'll have to create a `.terraformrc` file. Provider needs to be
-compiled as well. (`go install`) 
+compiled as well. (`go install`)
 ```text
 provider_installation {
 
@@ -64,3 +44,22 @@ provider_installation {
 ```
 
 Then, simply run `terraform plan` on code that uses this provider.
+
+# Roadmap
+
+- [x] Datasource to list available OSes (templates): GET /vm/templates
+- [ ] Datasource to list available locations: GET /vm/locations
+- [ ] Resource to create a VM: POST /vm/create
+```text
+location_id	        Integer	Virtual server's location ID.
+instance_size	        Integer	Instance's size ID. [A list of available sizes can be returned with the /vm/sizes/ call]
+template	        String	ID of the OS' template or the UUID of the image to install [A list of available templates can be returned with the /vm/templates call and images with /vm/images/list]
+hostname	        String	New hostname of the server/VM
+sshKeys (optional)	Array	SSH Keys
+```
+
+- [ ] Resource to delete a VM: POST /vm/destroy
+```text
+vm_id	        Integer	Virtual server ID
+confirm_close	Boolean	Parameter to confirm you want to pay the bandwidth overage
+```
