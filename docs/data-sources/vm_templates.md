@@ -17,6 +17,7 @@ List the templates available for VM creation
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `templates` (Attributes List) (see [below for nested schema](#nestedatt--templates))
 
 <a id="nestedatt--templates"></a>

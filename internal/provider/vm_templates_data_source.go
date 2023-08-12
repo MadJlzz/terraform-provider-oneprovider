@@ -1,4 +1,4 @@
-package datasources
+package provider
 
 import (
 	"context"
@@ -27,6 +27,7 @@ type listVMTemplatesDataSource struct {
 
 // listVMTemplatesDataSourceModel describes the data source data model.
 type listVMTemplatesDataSourceModel struct {
+	ID          types.String      `tfsdk:"id"`
 	VMTemplates []vmTemplateModel `tfsdk:"templates"`
 }
 
@@ -52,6 +53,9 @@ func (d *listVMTemplatesDataSource) Schema(ctx context.Context, req datasource.S
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "List the templates available for VM creation",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"templates": schema.ListNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
@@ -118,9 +122,9 @@ func (d *listVMTemplatesDataSource) Read(ctx context.Context, req datasource.Rea
 		state.VMTemplates = append(state.VMTemplates, templateState)
 	}
 
+	// This is required by terraform for running acceptance tests.
+	state.ID = types.StringValue("placeholder")
+
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
-	//if resp.Diagnostics.HasError() {
-	//	return
-	//}
 }
