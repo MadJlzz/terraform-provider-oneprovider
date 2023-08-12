@@ -51,25 +51,48 @@ func (d *listVMTemplatesDataSource) Metadata(ctx context.Context, req datasource
 
 func (d *listVMTemplatesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "List the templates available for VM creation",
+		Description: "Fetches list of VM templates available.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Description: "Placeholder identifier attribute.",
+				Computed:    true,
 			},
 			"templates": schema.ListNestedAttribute{
-				Computed: true,
+				Description: "List of VM templates.",
+				Computed:    true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"id":   schema.Int64Attribute{Computed: true},
-						"name": schema.StringAttribute{Computed: true},
-						"size": schema.StringAttribute{Computed: true},
+						"id": schema.Int64Attribute{
+							Description: "Numeric identifier of the template.",
+							Computed:    true,
+						},
+						"name": schema.StringAttribute{
+							Description: "Name of the template.",
+							Computed:    true,
+						},
+						"size": schema.StringAttribute{
+							Description: "Size of the template in ???",
+							Computed:    true,
+						},
 						"display": schema.SingleNestedAttribute{
 							Computed: true,
 							Attributes: map[string]schema.Attribute{
-								"name":        schema.StringAttribute{Computed: true},
-								"display":     schema.StringAttribute{Computed: true},
-								"description": schema.StringAttribute{Computed: true},
-								"oca":         schema.Int64Attribute{Computed: true},
+								"name": schema.StringAttribute{
+									Description: "Display name of the template.",
+									Computed:    true,
+								},
+								"display": schema.StringAttribute{
+									Description: "Display of the template.",
+									Computed:    true,
+								},
+								"description": schema.StringAttribute{
+									Description: "Description of the display template.",
+									Computed:    true,
+								},
+								"oca": schema.Int64Attribute{
+									Description: "???",
+									Computed:    true,
+								},
 							},
 						},
 					},

@@ -47,18 +47,18 @@ func (p *OneProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
-				Optional:            true,
-				Sensitive:           true,
-				MarkdownDescription: "API key required by OneProvider to run authenticated requests",
+				Description: "Api Key for OneProvider API. May also be provided via ONEPROVIDER_API_KEY environment variable.",
+				Optional:    true,
+				Sensitive:   true,
 			},
 			"client_key": schema.StringAttribute{
-				Optional:            true,
-				Sensitive:           true,
-				MarkdownDescription: "Client key required by OneProvider to run authenticated requests",
+				Description: "Client key for OneProvider API. May also be provided via ONEPROVIDER_CLIENT_KEY environment variable.",
+				Optional:    true,
+				Sensitive:   true,
 			},
 			"endpoint": schema.StringAttribute{
-				Optional:            true,
-				MarkdownDescription: "The host to which requests will be sent to. Defaults to api.oneprovider.com",
+				Description: "URI for OneProvider API. Defaults to https://api.oneprovider.com",
+				Optional:    true,
 			},
 		},
 	}
