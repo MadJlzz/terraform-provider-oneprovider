@@ -75,6 +75,12 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - run: go mod download
+      - name: Run Mockoon CLI
+        uses: mockoon/cli-action@v1
+        with:
+          version: "latest"
+          data-file: "./mockoon/oneprovider.json"
+          port: 3000
       - env:
           TF_ACC: "1"
         run: go test -v -cover ./internal/provider/

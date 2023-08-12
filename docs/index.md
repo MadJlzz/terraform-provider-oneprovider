@@ -13,8 +13,11 @@ description: |-
 ## Example Usage
 
 ```terraform
+# Configuration-based authentication
 provider "oneprovider" {
-  # example configuration here
+  api_key    = "apikey123"
+  client_key = "clientkey123"
+  endpoint   = "http://localhost:3000"
 }
 ```
 
@@ -23,4 +26,6 @@ provider "oneprovider" {
 
 ### Optional
 
-- `api_key` (String, Sensitive) API key required by OneProvider to run authenticated requests
+- `api_key` (String, Sensitive) Api Key for OneProvider API. May also be provided via ONEPROVIDER_API_KEY environment variable.
+- `client_key` (String, Sensitive) Client key for OneProvider API. May also be provided via ONEPROVIDER_CLIENT_KEY environment variable.
+- `endpoint` (String) URI for OneProvider API. Defaults to https://api.oneprovider.com

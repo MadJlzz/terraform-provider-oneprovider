@@ -1,3 +1,6 @@
+# Configuration-based authentication
 provider "oneprovider" {
-  # example configuration here
+  api_key    = "apikey123"
+  client_key = "clientkey123"
+  endpoint   = "http://localhost:3000"
 }
