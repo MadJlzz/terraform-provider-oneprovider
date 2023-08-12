@@ -1,10 +1,10 @@
 package oneprovider
 
-type ListTemplatesResponse struct {
-	Templates []TemplateResponse `json:"response"`
+type ListVMTemplatesResponse struct {
+	Templates []VMTemplateResponse `json:"response"`
 }
 
-type TemplateResponse struct {
+type VMTemplateResponse struct {
 	Id      int    `json:"id"`
 	Name    string `json:"name"`
 	Size    string `json:"size"`

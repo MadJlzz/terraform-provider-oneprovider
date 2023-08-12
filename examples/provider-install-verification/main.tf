@@ -12,4 +12,8 @@ provider "oneprovider" {
   client_key = "fakeClientKey"
 }
 
-data "oneprovider_example" "example" {}
+data "oneprovider_vm_templates" "example" {}
+
+output "test" {
+  value = data.oneprovider_vm_templates.example
+}

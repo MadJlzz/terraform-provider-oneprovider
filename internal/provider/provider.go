@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"github.com/MadJlzz/terraform-provider-oneprovider/internal/datasources"
-	"github.com/MadJlzz/terraform-provider-oneprovider/internal/oneprovider"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"

@@ -8,7 +8,7 @@ import (
 )
 
 type API interface {
-	ListTemplates(ctx context.Context) (*ListTemplatesResponse, error)
+	ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error)
 }
 
 type service struct {
@@ -18,6 +18,7 @@ type service struct {
 }
 
 func NewService(endpoint, apiKey, clientKey string) (API, error) {
+	// TODO: add validation of the service creation
 	return &service{
 		endpoint:  endpoint,
 		apiKey:    apiKey,
@@ -25,7 +26,7 @@ func NewService(endpoint, apiKey, clientKey string) (API, error) {
 	}, nil
 }
 
-func (s *service) ListTemplates(ctx context.Context) (*ListTemplatesResponse, error) {
+func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error) {
 	url := fmt.Sprintf("%s/vm/templates", s.endpoint)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -40,7 +41,7 @@ func (s *service) ListTemplates(ctx context.Context) (*ListTemplatesResponse, er
 	}
 	defer resp.Body.Close()
 
-	var ltr ListTemplatesResponse
+	var ltr ListVMTemplatesResponse
 	err = json.NewDecoder(resp.Body).Decode(&ltr)
 	if err != nil {
 		return nil, err
