@@ -15,3 +15,6 @@ type VMTemplateResponse struct {
 		Oca         int    `json:"oca"`
 	}
 }
+
+type ListLocationsResponse struct {
+}
