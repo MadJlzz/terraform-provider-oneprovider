@@ -18,6 +18,7 @@ var (
 
 type API interface {
 	ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error)
+	ListLocations(ctx context.Context) (*ListLocationsResponse, error)
 }
 
 type service struct {
@@ -69,6 +70,30 @@ func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, 
 	}
 
 	return &ltr, nil
+}
+
+func (s *service) ListLocations(ctx context.Context) (*ListLocationsResponse, error) {
+	uri := fmt.Sprintf("%s/vm/locations", s.endpoint)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		return nil, err
+	}
+	s.addHeaders(req)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var llr ListLocationsResponse
+	err = json.NewDecoder(resp.Body).Decode(&llr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &llr, nil
 }
 
 func (s *service) addHeaders(req *http.Request) {
