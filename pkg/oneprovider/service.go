@@ -48,23 +48,31 @@ func NewService(endpoint, apiKey, clientKey string) (API, error) {
 	}, nil
 }
 
-func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error) {
-	uri := fmt.Sprintf("%s/vm/templates", s.endpoint)
+func (s *service) doGet(ctx context.Context, apiUrl string, v any) error {
+	uri := fmt.Sprintf("%s/%s", s.endpoint, apiUrl)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	s.addHeaders(req)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
+	err = json.NewDecoder(resp.Body).Decode(&v)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error) {
 	var ltr ListVMTemplatesResponse
-	err = json.NewDecoder(resp.Body).Decode(&ltr)
+	err := s.doGet(ctx, "vm/templates", &ltr)
 	if err != nil {
 		return nil, err
 	}
@@ -73,22 +81,8 @@ func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, 
 }
 
 func (s *service) ListLocations(ctx context.Context) (*ListLocationsResponse, error) {
-	uri := fmt.Sprintf("%s/vm/locations", s.endpoint)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
-	if err != nil {
-		return nil, err
-	}
-	s.addHeaders(req)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var llr ListLocationsResponse
-	err = json.NewDecoder(resp.Body).Decode(&llr)
+	err := s.doGet(ctx, "vm/locations", &llr)
 	if err != nil {
 		return nil, err
 	}

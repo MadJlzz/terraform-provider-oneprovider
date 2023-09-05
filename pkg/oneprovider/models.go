@@ -45,15 +45,6 @@ func (l Location) String() string {
 	return "unknown"
 }
 
-//type CityResponse struct {
-//	Id             string   `json:"id"`
-//	Region         string   `json:"region"`
-//	Country        string   `json:"country"`
-//	City           string   `json:"city"`
-//	AvailableTypes []string `json:"available_types"`
-//	AvailableSizes []int    `json:"available_sizes"`
-//}
-
 type ListLocationsResponse struct {
 	Locations map[string][]LocationResponse `json:"response"`
 }
