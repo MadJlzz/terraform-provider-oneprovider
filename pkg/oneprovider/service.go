@@ -48,6 +48,26 @@ func NewService(endpoint, apiKey, clientKey string) (API, error) {
 	}, nil
 }
 
+func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error) {
+	var ltr ListVMTemplatesResponse
+	err := s.doGet(ctx, "vm/templates", &ltr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ltr, nil
+}
+
+func (s *service) ListLocations(ctx context.Context) (*ListLocationsResponse, error) {
+	var llr ListLocationsResponse
+	err := s.doGet(ctx, "vm/locations", &llr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &llr, nil
+}
+
 func (s *service) doGet(ctx context.Context, apiUrl string, v any) error {
 	uri := fmt.Sprintf("%s/%s", s.endpoint, apiUrl)
 
@@ -68,26 +88,6 @@ func (s *service) doGet(ctx context.Context, apiUrl string, v any) error {
 		return err
 	}
 	return nil
-}
-
-func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error) {
-	var ltr ListVMTemplatesResponse
-	err := s.doGet(ctx, "vm/templates", &ltr)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ltr, nil
-}
-
-func (s *service) ListLocations(ctx context.Context) (*ListLocationsResponse, error) {
-	var llr ListLocationsResponse
-	err := s.doGet(ctx, "vm/locations", &llr)
-	if err != nil {
-		return nil, err
-	}
-
-	return &llr, nil
 }
 
 func (s *service) addHeaders(req *http.Request) {
