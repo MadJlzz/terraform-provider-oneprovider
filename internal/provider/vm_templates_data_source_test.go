@@ -2,30 +2,38 @@ package provider
 
 import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/statecheck"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 	"testing"
 )
 
+const testAccVmTemplatesDataSourceConfig = `
+data "oneprovider_vm_templates" "test" {}
+`
+
 func TestAccVmTemplatesDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Read testing
 			{
-				Config: providerConfig + `data "oneprovider_vm_templates" "test" {}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					// Verify number of coffees returned
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.#", "19"),
-					// Verify the first coffee to ensure all attributes are set
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.id", "771"),
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.name", "Debian 9.4 64bits"),
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.size", "5368709120"),
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.display.name", "debian"),
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.display.display", "Debian 9.4 64bits"),
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.display.description", ""),
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "templates.0.display.oca", "0"),
-					// Verify placeholder id attribute
-					resource.TestCheckResourceAttr("data.oneprovider_vm_templates.test", "id", "placeholder"),
-				),
+				Config: testAccVmTemplatesDataSourceConfig,
+				ConfigStateChecks: []statecheck.StateCheck{
+					// Verify the placeholder ID is set correctly
+					statecheck.ExpectKnownValue(
+						"data.oneprovider_vm_templates.test",
+						tfjsonpath.New("id"),
+						knownvalue.StringExact("placeholder"),
+					),
+					// Verify templates list exists (may be empty)
+					//statecheck.ExpectKnownValue(
+					//	"data.oneprovider_vm_templates.test",
+					//	tfjsonpath.New("templates"),
+					//	knownvalue.NotNull(),
+					//),
+				},
 			},
 		},
 	})

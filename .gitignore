@@ -22,7 +22,7 @@ website/node_modules
 .idea
 *.iml
 *.test
-*.iml
+.envrc
 
 website/vendor
 
