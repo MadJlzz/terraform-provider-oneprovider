@@ -3,13 +3,13 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/api"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 type baseDatasource struct {
-	svc oneprovider.API
+	svc *api.OneProvider
 }
 
 func (bd *baseDatasource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
@@ -19,7 +19,7 @@ func (bd *baseDatasource) Configure(ctx context.Context, req datasource.Configur
 		return
 	}
 	tflog.Info(ctx, "configuring datasource dependencies")
-	svc, ok := req.ProviderData.(oneprovider.API)
+	svc, ok := req.ProviderData.(*api.OneProvider)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
