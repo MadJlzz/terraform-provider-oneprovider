@@ -81,5 +81,7 @@ jobs:
       - run: go mod download
       - env:
           TF_ACC: "1"
+          ONEPROVIDER_API_KEY: ${{ secrets.ONEPROVIDER_API_KEY }}
+          ONEPROVIDER_CLIENT_KEY: ${{ secrets.ONEPROVIDER_CLIENT_KEY }}
         run: go test -v -cover ./internal/provider/
         timeout-minutes: 10
