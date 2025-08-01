@@ -2,14 +2,14 @@
 
 # Terraform Provider OneProvider
 
-Terraform provider for OneProvider. Provider documentation is available [here]().
+Terraform provider for OneProvider. Provider documentation is available [here](https://registry.terraform.io/providers/MadJlzz/oneprovider/latest).
 
 ## Contribute
 
 ### Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.20
+- [Go](https://golang.org/doc/install) >= 1.23.7
 
 ### Developing the provider
 
@@ -19,7 +19,7 @@ To compile the provider, run `go install`. This will build the provider and put 
 
 To generate or update documentation, run `go generate`.
 
-In order to run the full suite of Acceptance tests, run `make testacc`.
+To run the full suite of Acceptance tests, run `make testacc`.
 
 *Note:* Acceptance tests create real resources, and often cost money to run.
 
@@ -44,22 +44,3 @@ provider_installation {
 ```
 
 Then, simply run `terraform plan` on code that uses this provider.
-
-# Roadmap
-
-- [x] Datasource to list available OSes (templates): GET /vm/templates
-- [ ] Datasource to list available locations: GET /vm/locations
-- [ ] Resource to create a VM: POST /vm/create
-```text
-location_id	        Integer	Virtual server's location ID.
-instance_size	        Integer	Instance's size ID. [A list of available sizes can be returned with the /vm/sizes/ call]
-template	        String	ID of the OS' template or the UUID of the image to install [A list of available templates can be returned with the /vm/templates call and images with /vm/images/list]
-hostname	        String	New hostname of the server/VM
-sshKeys (optional)	Array	SSH Keys
-```
-
-- [ ] Resource to delete a VM: POST /vm/destroy
-```text
-vm_id	        Integer	Virtual server ID
-confirm_close	Boolean	Parameter to confirm you want to pay the bandwidth overage
-```

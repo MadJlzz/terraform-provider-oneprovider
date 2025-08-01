@@ -1,0 +1,1877 @@
+{
+  "result": "success",
+  "response": {
+    "North America": [
+      {
+        "id": "171",
+        "region": "North America",
+        "country": "US",
+        "city": "Ashburn",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "0"
+        }
+      },
+      {
+        "id": "9",
+        "region": "North America",
+        "country": "US",
+        "city": "Atlanta",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          63,
+          65,
+          66,
+          67,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "7",
+        "region": "North America",
+        "country": "US",
+        "city": "Chicago",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "8",
+        "region": "North America",
+        "country": "US",
+        "city": "Dallas",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "24",
+        "region": "North America",
+        "country": "US",
+        "city": "Kansas City",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "6",
+        "region": "North America",
+        "country": "US",
+        "city": "Los Angeles",
+        "available_types": [
+          "Storage",
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "4",
+        "region": "North America",
+        "country": "MX",
+        "city": "Mexico City",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "21",
+        "region": "North America",
+        "country": "US",
+        "city": "Miami",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "27",
+        "region": "North America",
+        "country": "CA",
+        "city": "Montreal",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "17",
+        "region": "North America",
+        "country": "US",
+        "city": "New York",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "123",
+        "region": "North America",
+        "country": "US",
+        "city": "Portland",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "99",
+        "region": "North America",
+        "country": "US",
+        "city": "Salt Lake City",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          63,
+          65,
+          66,
+          67,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "189",
+        "region": "North America",
+        "country": "PR",
+        "city": "San Juan",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "11",
+        "region": "North America",
+        "country": "US",
+        "city": "Seattle",
+        "available_types": [
+          "General Purpose",
+          "High performance",
+          "Storage optimized"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "28",
+        "region": "North America",
+        "country": "CA",
+        "city": "Toronto",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "29",
+        "region": "North America",
+        "country": "CA",
+        "city": "Vancouver",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "23",
+        "region": "North America",
+        "country": "US",
+        "city": "Washington",
+        "available_types": [
+          "Storage"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "0"
+        }
+      }
+    ],
+    "Europe": [
+      {
+        "id": "32",
+        "region": "Europe",
+        "country": "NL",
+        "city": "Amsterdam",
+        "available_types": [
+          "General Purpose",
+          "High performance",
+          "Development",
+          "Storage optimized"
+        ],
+        "available_sizes": [
+          63,
+          65,
+          66,
+          67,
+          68,
+          86,
+          87,
+          88,
+          89,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "81",
+        "region": "Europe",
+        "country": "GR",
+        "city": "Athens",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "163",
+        "region": "Europe",
+        "country": "ES",
+        "city": "Barcelona",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "170",
+        "region": "Europe",
+        "country": "RS",
+        "city": "Belgrade",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "33",
+        "region": "Europe",
+        "country": "BE",
+        "city": "Brussels",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "43",
+        "region": "Europe",
+        "country": "RO",
+        "city": "Bucharest",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "87",
+        "region": "Europe",
+        "country": "DK",
+        "city": "Copenhagen",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "35",
+        "region": "Europe",
+        "country": "IE",
+        "city": "Dublin",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "154",
+        "region": "Europe",
+        "country": "DE",
+        "city": "Dusseldorf",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "0"
+        }
+      },
+      {
+        "id": "190",
+        "region": "Europe",
+        "country": "IT",
+        "city": "Florence",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "36",
+        "region": "Europe",
+        "country": "DE",
+        "city": "Frankfurt",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          63,
+          65,
+          66,
+          67,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "37",
+        "region": "Europe",
+        "country": "FI",
+        "city": "Helsinki",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          63,
+          65,
+          66,
+          67,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "52",
+        "region": "Europe",
+        "country": "UA",
+        "city": "Kyiv",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "38",
+        "region": "Europe",
+        "country": "PT",
+        "city": "Lisbon",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "39",
+        "region": "Europe",
+        "country": "UK",
+        "city": "London",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "88",
+        "region": "Europe",
+        "country": "ES",
+        "city": "Madrid",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "40",
+        "region": "Europe",
+        "country": "RU",
+        "city": "Moscow",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "174",
+        "region": "Europe",
+        "country": "CY",
+        "city": "Nicosia",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "0"
+        }
+      },
+      {
+        "id": "86",
+        "region": "Europe",
+        "country": "NO",
+        "city": "Oslo",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "0",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "34",
+        "region": "Europe",
+        "country": "FR",
+        "city": "Paris",
+        "available_types": [
+          "General Purpose",
+          "High performance",
+          "Development"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          86,
+          87,
+          88,
+          89
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "44",
+        "region": "Europe",
+        "country": "CZ",
+        "city": "Prague",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "50",
+        "region": "Europe",
+        "country": "BG",
+        "city": "Sofia",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "45",
+        "region": "Europe",
+        "country": "SE",
+        "city": "Stockholm",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "49",
+        "region": "Europe",
+        "country": "AT",
+        "city": "Vienna",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "83",
+        "region": "Europe",
+        "country": "LT",
+        "city": "Vilnius",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "47",
+        "region": "Europe",
+        "country": "PL",
+        "city": "Warsaw",
+        "available_types": [
+          "General Purpose",
+          "High performance",
+          "Development"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          86,
+          87,
+          88,
+          89
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "48",
+        "region": "Europe",
+        "country": "CH",
+        "city": "Zurich",
+        "available_types": [
+          "General Purpose",
+          "High performance",
+          "Storage"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      }
+    ],
+    "Asia": [
+      {
+        "id": "53",
+        "region": "Asia",
+        "country": "TH",
+        "city": "Bangkok",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "0"
+        }
+      },
+      {
+        "id": "75",
+        "region": "Asia",
+        "country": "AE",
+        "city": "Dubai",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "0",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "60",
+        "region": "Asia",
+        "country": "HK",
+        "city": "Hong Kong",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "179",
+        "region": "Asia",
+        "country": "PK",
+        "city": "Islamabad",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "62",
+        "region": "Asia",
+        "country": "TR",
+        "city": "Istanbul",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "0"
+        }
+      },
+      {
+        "id": "56",
+        "region": "Asia",
+        "country": "MY",
+        "city": "Kuala Lumpur",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "157",
+        "region": "Asia",
+        "country": "IN",
+        "city": "Mumbai",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "59",
+        "region": "Asia",
+        "country": "SG",
+        "city": "Singapore",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "85",
+        "region": "Asia",
+        "country": "TW",
+        "city": "Taipei",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "63",
+        "region": "Asia",
+        "country": "IL",
+        "city": "Tel Aviv",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "57",
+        "region": "Asia",
+        "country": "JP",
+        "city": "Tokyo",
+        "available_types": [
+          "General Purpose",
+          "High performance"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      }
+    ],
+    "Oceania": [
+      {
+        "id": "68",
+        "region": "Oceania",
+        "country": "AU",
+        "city": "Sydney",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          63,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      }
+    ],
+    "South America": [
+      {
+        "id": "106",
+        "region": "South America",
+        "country": "CO",
+        "city": "Bogota",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "1",
+        "region": "South America",
+        "country": "AR",
+        "city": "Buenos Aires",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "188",
+        "region": "South America",
+        "country": "GT",
+        "city": "Guatemala City",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "199",
+        "region": "South America",
+        "country": "BO",
+        "city": "La Paz",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "186",
+        "region": "South America",
+        "country": "PE",
+        "city": "Lima",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "187",
+        "region": "South America",
+        "country": "EC",
+        "city": "Quito",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "112",
+        "region": "South America",
+        "country": "CR",
+        "city": "San Jose",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "72",
+        "region": "South America",
+        "country": "CL",
+        "city": "Santiago",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "3",
+        "region": "South America",
+        "country": "BR",
+        "city": "Sao Paulo",
+        "available_types": [
+          "High performance",
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "0",
+          "ipv6": "1"
+        }
+      }
+    ],
+    "Africa": [
+      {
+        "id": "198",
+        "region": "Africa",
+        "country": "MA",
+        "city": "Fez",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56,
+          69,
+          70,
+          71
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "76",
+        "region": "Africa",
+        "country": "ZA",
+        "city": "Johannesburg",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          54,
+          55,
+          56
+        ],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      },
+      {
+        "id": "156",
+        "region": "Africa",
+        "country": "NG",
+        "city": "Lagos",
+        "available_types": [
+          "General Purpose"
+        ],
+        "available_sizes": [],
+        "available_ips": {
+          "ipv4": "1",
+          "ipv6": "1"
+        }
+      }
+    ]
+  }
+}

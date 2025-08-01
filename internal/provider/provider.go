@@ -116,7 +116,7 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	svc, err := oneprovider.NewService(endpoint, clientKey, apiKey)
+	svc, err := oneprovider.NewService(endpoint, apiKey, clientKey)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create OneProvider API client",
@@ -137,6 +137,7 @@ func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource 
 func (p *OneProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewVmTemplatesDataSource,
+		NewVMLocationDataSource,
 	}
 }
 
