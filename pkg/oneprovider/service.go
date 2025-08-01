@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type API interface {
-	ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error)
+	GetTemplateByName(ctx context.Context, name string) (*VMTemplateResponse, error)
 	GetLocationByCity(ctx context.Context, city string) (*VMLocationResponse, error)
 }
 
@@ -26,6 +28,39 @@ func NewService(endpoint, apiKey, clientKey string) (API, error) {
 		apiKey:    apiKey,
 		clientKey: clientKey,
 	}, nil
+}
+
+func (s *service) GetTemplateByName(ctx context.Context, name string) (*VMTemplateResponse, error) {
+	var response ListVMTemplatesResponse
+	err := s.makeAPICall(ctx, http.MethodGet, "/vm/templates/", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	tpl, found := common.FindElement(response.Templates, func(t VMTemplateResponse) bool {
+		return strings.EqualFold(t.Name, name)
+	})
+	if !found {
+		return nil, fmt.Errorf("template not found for name %s", name)
+	}
+	return &tpl, nil
+}
+
+func (s *service) GetLocationByCity(ctx context.Context, city string) (*VMLocationResponse, error) {
+	var response ListVMLocationsResponse
+	err := s.makeAPICall(ctx, http.MethodGet, "/vm/locations", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	findCityFn := func(l VMLocationResponse) bool { return l.City == city }
+
+	for _, regions := range response.Response {
+		location, found := common.FindElement(regions, findCityFn)
+		if found {
+			return &location, nil
+		}
+	}
+	return nil, fmt.Errorf("location not found for city %s", city)
 }
 
 func (s *service) makeAPICall(ctx context.Context, method, endpoint string, body io.Reader, result interface{}) error {
@@ -58,40 +93,4 @@ func (s *service) makeAPICall(ctx context.Context, method, endpoint string, body
 	}
 
 	return nil
-}
-
-func (s *service) ListTemplates(ctx context.Context) (*ListVMTemplatesResponse, error) {
-	var response ListVMTemplatesResponse
-	err := s.makeAPICall(ctx, http.MethodGet, "/vm/templates", nil, &response)
-	if err != nil {
-		return nil, err
-	}
-	return &response, nil
-}
-
-func findLocation(locations map[string][]VMLocationResponse, filterFunc func(response VMLocationResponse) bool) *VMLocationResponse {
-	for _, locationList := range locations {
-		for _, location := range locationList {
-			if filterFunc(location) {
-				return &location
-			}
-		}
-	}
-	return nil
-}
-
-func (s *service) GetLocationByCity(ctx context.Context, city string) (*VMLocationResponse, error) {
-	var response ListVMLocationsResponse
-	err := s.makeAPICall(ctx, http.MethodGet, "/vm/locations", nil, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	l := findLocation(response.Response, func(l VMLocationResponse) bool {
-		return l.City == city
-	})
-	if l == nil {
-		return nil, fmt.Errorf("location not found for city %s", city)
-	}
-	return l, nil
 }

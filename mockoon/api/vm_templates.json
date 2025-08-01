@@ -1,0 +1,203 @@
+{
+  "result": "success",
+  "response": [
+    {
+      "id": 771,
+      "name": "Debian 9.4 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "debian",
+        "display": "Debian 9.4 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 812,
+      "name": "Ubuntu 18.04 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "ubuntu",
+        "display": "Ubuntu 18.04 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 878,
+      "name": "Debian 10 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "debian",
+        "display": "Debian 10 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 909,
+      "name": "Ubuntu 20.04 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "ubuntu",
+        "display": "Ubuntu 20.04 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 929,
+      "name": "Suse 15.1 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "suse",
+        "display": "Suse 15.1 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 961,
+      "name": "CentOS 7.9 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "centos",
+        "display": "CentOS 7.9 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 979,
+      "name": "Debian 11 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "debian",
+        "display": "Debian 11 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 995,
+      "name": "Fedora 34 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "fedora",
+        "display": "Fedora 34 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1017,
+      "name": "Ubuntu 22.04 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "ubuntu",
+        "display": "Ubuntu 22.04 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1055,
+      "name": "Debian 12 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "debian",
+        "display": "Debian 12 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1087,
+      "name": "Oracle Linux 8.9 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "oracle",
+        "display": "Oracle Linux 8.9 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1097,
+      "name": "CentOS 9.3 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "centos",
+        "display": "CentOS 9.3 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1108,
+      "name": "Ubuntu 24.04 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "ubuntu",
+        "display": "Ubuntu 24.04 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1116,
+      "name": "Oracle Linux 9.4 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "oracle",
+        "display": "Oracle Linux 9.4 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1138,
+      "name": "AlmaLinux 9.5 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "almalinux",
+        "display": "AlmaLinux 9.5 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1141,
+      "name": "Rocky Linux 9.5 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "rocky",
+        "display": "Rocky Linux 9.5 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1148,
+      "name": "AlmaLinux 8.10 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "almalinux",
+        "display": "AlmaLinux 8.10 64bits",
+        "description": "",
+        "oca": 0
+      }
+    },
+    {
+      "id": 1151,
+      "name": "Rocky Linux 8.10 64bits",
+      "size": "5368709120",
+      "display": {
+        "name": "rocky",
+        "display": "Rocky Linux 8.10 64bits",
+        "description": "",
+        "oca": 0
+      }
+    }
+  ]
+}

@@ -136,7 +136,7 @@ func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource 
 
 func (p *OneProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewVmTemplatesDataSource,
+		NewVmTemplateDataSource,
 		NewVMLocationDataSource,
 	}
 }

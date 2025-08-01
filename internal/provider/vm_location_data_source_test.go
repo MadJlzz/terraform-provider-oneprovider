@@ -17,7 +17,7 @@ const testAccVmLocationDataSourceThatDontExistsConfig = `
 data "oneprovider_vm_location" "fez" {city = "fez"}
 `
 
-func TestAccVmLocationDataSourceThatExists(t *testing.T) {
+func TestAccVmLocationDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
