@@ -2,11 +2,10 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var (
@@ -94,22 +93,21 @@ func (ds *vmLocationDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	city := data.City.ValueString()
 	if city == "" {
-		resp.Diagnostics.AddError(
-			"city is required to filter api results",
-			"city is required to filter api results",
+		resp.Diagnostics.AddAttributeError(
+			path.Root("city"),
+			"Missing attribute configuration",
+			"City is required to filter api results. Please provide a valid city name.",
 		)
 		return
 	}
 
-	tflog.Info(ctx, "retrieving vm location data for", map[string]any{
-		"city": city,
-	})
-
 	l, err := ds.svc.VM.GetLocationByCity(ctx, city)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("unable to get vm location data for city %s", city),
-			err.Error(),
+			"Unable to refresh datasource",
+			"An unexpected error occurred while creating the datasource read request."+
+				"Please report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
 		return
 	}

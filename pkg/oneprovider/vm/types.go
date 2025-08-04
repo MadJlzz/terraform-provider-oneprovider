@@ -5,11 +5,6 @@ import (
 	"strconv"
 )
 
-type ApiError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 type TemplatesListResponse struct {
 	Templates []TemplateReadResponse `json:"response"`
 }
@@ -27,9 +22,7 @@ type TemplateReadResponse struct {
 }
 
 type LocationsListResponse struct {
-	Result   string                            `json:"result"`
 	Response map[string][]LocationReadResponse `json:"response"`
-	Error    *ApiError                         `json:"error"`
 }
 
 type LocationReadResponse struct {
@@ -46,7 +39,6 @@ type LocationReadResponse struct {
 }
 
 type InstanceReadResponse struct {
-	Result   string `json:"result"`
 	Response struct {
 		ServerInfo struct {
 			IpAddress string `json:"ipaddress"`
@@ -54,7 +46,6 @@ type InstanceReadResponse struct {
 			City      string `json:"city"`
 		} `json:"server_info"`
 	} `json:"response"`
-	Error *ApiError `json:"error"`
 }
 
 type InstanceCreateRequest struct {
@@ -74,7 +65,6 @@ func (v *InstanceCreateRequest) UrlValues() url.Values {
 }
 
 type InstanceCreateResponse struct {
-	Result   string `json:"result"`
 	Response struct {
 		Message   string `json:"message"`
 		Id        string `json:"id"`
@@ -82,7 +72,6 @@ type InstanceCreateResponse struct {
 		Hostname  string `json:"hostname"`
 		Password  string `json:"password"`
 	} `json:"response"`
-	Error *ApiError `json:"error"`
 }
 
 type InstanceUpdateRequest struct {
@@ -98,11 +87,9 @@ func (v *InstanceUpdateRequest) HostnameUrlValues() url.Values {
 }
 
 type InstanceUpdateResponse struct {
-	Result   string `json:"result"`
 	Response struct {
 		Message string `json:"message"`
 	} `json:"response"`
-	Error *ApiError `json:"error"`
 }
 
 type InstanceDestroyRequest struct {
@@ -118,7 +105,6 @@ func (v *InstanceDestroyRequest) UrlValues() url.Values {
 }
 
 type InstanceDestroyResponse struct {
-	Result   string `json:"result"`
 	Response struct {
 		Message                  string `json:"message"`
 		UsageHours               string `json:"usageHours"`
@@ -126,5 +112,4 @@ type InstanceDestroyResponse struct {
 		BandwidthOverusageCost   string `json:"bandwidthOverusageCost"`
 		AdditionalHoursForCharge string `json:"additionalHoursForCharge"`
 	} `json:"response"`
-	Error *ApiError `json:"error"`
 }

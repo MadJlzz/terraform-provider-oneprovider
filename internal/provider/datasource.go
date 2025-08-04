@@ -9,7 +9,7 @@ import (
 )
 
 type baseDatasource struct {
-	svc *oneprovider.OneProvider
+	svc *oneprovider.Service
 }
 
 func (bd *baseDatasource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
@@ -19,7 +19,7 @@ func (bd *baseDatasource) Configure(ctx context.Context, req datasource.Configur
 		return
 	}
 	tflog.Info(ctx, "configuring datasource dependencies")
-	svc, ok := req.ProviderData.(*oneprovider.OneProvider)
+	svc, ok := req.ProviderData.(*oneprovider.Service)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",

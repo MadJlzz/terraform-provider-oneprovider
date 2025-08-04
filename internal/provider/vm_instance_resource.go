@@ -19,7 +19,7 @@ var (
 )
 
 type vmInstanceResource struct {
-	svc *oneprovider.OneProvider
+	svc *oneprovider.Service
 }
 
 type vmInstanceResourceModel struct {
@@ -105,11 +105,11 @@ func (r *vmInstanceResource) Configure(ctx context.Context, req resource.Configu
 		return
 	}
 	tflog.Info(ctx, "configuring datasource dependencies")
-	svc, ok := req.ProviderData.(*oneprovider.OneProvider)
+	svc, ok := req.ProviderData.(*oneprovider.Service)
 	if !ok {
 		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected oneprovider.API, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			"Unexpected service type",
+			fmt.Sprintf("Expected oneprovider.Service, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return
 	}
@@ -137,8 +137,10 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	vmInstance, err := r.svc.VM.CreateInstance(ctx, createRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to create VM instance",
-			err.Error(),
+			"Unable to create resource",
+			"An unexpected error occurred while attempting to create the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
 		return
 	}
@@ -158,29 +160,15 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 	info, err := r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to get VM instance by ID",
-			err.Error(),
+			"Unable to refresh resource",
+			"An unexpected error occurred while attempting to refresh the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
 		return
 	}
 
 	// TODO: It seems we need to do other calls to replace the names by their ID... (e.g city)
-	//        "server_info": {
-	//            "status": "success",
-	//            "ipaddress": "123.123.123.123",
-	//            "hostname": "hostname.example.com",
-	//            "template": "linux-centos-6.5-x86_64-min-gen2-v1",
-	//            "memory": "549755813888",
-	//            "space_gb": "20",
-	//            "ram_mb": "512",
-	//            "bandwidth_gb": "750",
-	//            "cpus": "1",
-	//            "country": "FR",
-	//            "city": "Paris",
-	//            "plan": "01d20c1",
-	//            "rootpassword": "dyx6M8kbZUg6enmqxJRI"
-	//            "is_legacy" : "false"
-	//        },
 	data.Hostname = types.StringValue(info.Response.ServerInfo.Hostname)
 	data.IPAddress = types.StringValue(info.Response.ServerInfo.IpAddress)
 
@@ -199,10 +187,20 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	_, err := r.svc.VM.UpdateInstance(ctx, updateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to update VM instance",
-			err.Error(),
+			"Unable to update resource",
+			"An unexpected error occurred while attempting to update the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
 		return
+	}
+
+	// TODO: not sure yet why this happens but essential
+	if data.Hostname.ValueString() != updateRequest.Hostname {
+		resp.Diagnostics.AddError(
+			"Unable to update resource",
+			"The hostname of the VM instance has been updated but the state is not up to date.",
+		)
 	}
 
 	data.Hostname = types.StringValue(updateRequest.Hostname)
@@ -226,8 +224,10 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 	_, err := r.svc.VM.DestroyInstance(ctx, destroyRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to destroy VM instance",
-			err.Error(),
+			"Unable to destroy resource",
+			"An unexpected error occurred while attempting to destroy the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
 		return
 	}

@@ -22,13 +22,13 @@ func (s *Service) GetTemplateByName(ctx context.Context, name string) (*Template
 	var response TemplatesListResponse
 	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/templates/", nil, &response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("vm: get template by name failed: %w", err)
 	}
 	tpl, found := common.FindElement(response.Templates, func(t TemplateReadResponse) bool {
 		return strings.EqualFold(t.Name, name)
 	})
 	if !found {
-		return nil, fmt.Errorf("template not found for name %s", name)
+		return nil, fmt.Errorf("vm: template not found for name %s", name)
 	}
 	return &tpl, nil
 }
@@ -37,7 +37,7 @@ func (s *Service) GetLocationByCity(ctx context.Context, city string) (*Location
 	var response LocationsListResponse
 	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/locations", nil, &response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("vm: get location by city name failed: %w", err)
 	}
 
 	findCityFn := func(l LocationReadResponse) bool { return l.City == city }
@@ -48,14 +48,14 @@ func (s *Service) GetLocationByCity(ctx context.Context, city string) (*Location
 			return &location, nil
 		}
 	}
-	return nil, fmt.Errorf("location not found for city %s", city)
+	return nil, fmt.Errorf("vm: location not found for city %s", city)
 }
 
 func (s *Service) GetInstanceByID(ctx context.Context, id string) (*InstanceReadResponse, error) {
 	var response InstanceReadResponse
 	err := s.client.MakeAPICall(ctx, http.MethodGet, fmt.Sprintf("/vm/info/%s", id), nil, &response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("vm: get instance by ID failed: %w", err)
 	}
 
 	return &response, nil
@@ -66,7 +66,7 @@ func (s *Service) CreateInstance(ctx context.Context, req *InstanceCreateRequest
 
 	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/create", strings.NewReader(req.UrlValues().Encode()), &response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("vm: create instance failed: %w", err)
 	}
 
 	return &response, nil
@@ -76,12 +76,12 @@ func (s *Service) UpdateInstance(ctx context.Context, req *InstanceUpdateRequest
 	var response InstanceUpdateResponse
 
 	if strings.TrimSpace(req.Hostname) == "" {
-		return nil, fmt.Errorf("hostname cannot be empty")
+		return nil, fmt.Errorf("vm: hostname cannot be empty")
 	}
 
 	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.HostnameUrlValues().Encode()), &response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("vm: update instance hostname failed: %w", err)
 	}
 
 	return &response, nil
@@ -92,7 +92,7 @@ func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyReque
 
 	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/destroy", strings.NewReader(req.UrlValues().Encode()), &response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("vm: destroy instance failed: %w", err)
 	}
 
 	return &response, nil

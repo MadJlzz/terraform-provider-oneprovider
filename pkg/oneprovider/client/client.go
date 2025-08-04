@@ -1,11 +1,13 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type Client struct {
@@ -15,7 +17,20 @@ type Client struct {
 }
 
 func NewClient(endpoint, apiKey, clientKey string) (*Client, error) {
-	// TODO: add validation of the client creation
+	endpoint = strings.TrimSpace(endpoint)
+	apiKey = strings.TrimSpace(apiKey)
+	clientKey = strings.TrimSpace(clientKey)
+
+	if endpoint == "" {
+		return nil, fmt.Errorf("client: endpoint cannot be empty")
+	}
+	if apiKey == "" {
+		return nil, fmt.Errorf("client: apiKey cannot be empty")
+	}
+	if clientKey == "" {
+		return nil, fmt.Errorf("client: clientKey cannot be empty")
+	}
+
 	return &Client{
 		endpoint:  endpoint,
 		apiKey:    apiKey,
@@ -23,9 +38,14 @@ func NewClient(endpoint, apiKey, clientKey string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body io.Reader, result interface{}) error {
-	requestURL := fmt.Sprintf("%s%s", c.endpoint, endpoint)
+func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body io.Reader, result any) error {
+	// Since we always have a response tied to an API call
+	// we're return earlier to prevent development bugs.
+	if result == nil {
+		return fmt.Errorf("client: result parameter cannot be nil for API calls that return JSON")
+	}
 
+	requestURL := fmt.Sprintf("%s%s", c.endpoint, endpoint)
 	req, err := http.NewRequestWithContext(ctx, method, requestURL, body)
 	if err != nil {
 		return err
@@ -45,11 +65,37 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 	// because OneProvider API is always sending 200, hiding errors
 	// in the response body...
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("API request failed with status: %d", resp.StatusCode)
+		return fmt.Errorf("client: api request failed with status: %d", resp.StatusCode)
 	}
 
-	if result != nil {
-		return json.NewDecoder(resp.Body).Decode(result)
+	// Read the entire response body first
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("client: failed to read response body: %w", err)
+	}
+
+	// Check for API errors in the response body
+	var errorCheck struct {
+		Error *struct {
+			Code    int    `json:"code"`
+			Message string `json:"message"`
+		} `json:"error"`
+	}
+
+	// Try to decode the error structure.
+	unmarshalErr := json.Unmarshal(bodyBytes, &errorCheck)
+	if unmarshalErr != nil {
+		return fmt.Errorf("client: failed to decode error response body: %w", unmarshalErr)
+	}
+
+	// If there is an error, we stop and return it.
+	if errorCheck.Error != nil {
+		return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
+	}
+
+	// No API error found, decode into the result interface
+	if decodeErr := json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(result); decodeErr != nil {
+		return fmt.Errorf("client: failed to decode response: %w", decodeErr)
 	}
 
 	return nil

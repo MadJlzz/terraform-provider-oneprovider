@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"strconv"
 )
@@ -63,9 +64,10 @@ func (ds *vmTemplateDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	name := data.Name.ValueString()
 	if name == "" {
-		resp.Diagnostics.AddError(
-			"name is required to filter api results",
-			"name is required to filter api results",
+		resp.Diagnostics.AddAttributeError(
+			path.Root("name"),
+			"Missing attribute configuration",
+			"Name is required to filter api results. Please provide a valid name.",
 		)
 		return
 	}
@@ -73,8 +75,10 @@ func (ds *vmTemplateDataSource) Read(ctx context.Context, req datasource.ReadReq
 	tpl, err := ds.svc.VM.GetTemplateByName(ctx, name)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to get template by name",
-			err.Error(),
+			"Unable to refresh datasource",
+			"An unexpected error occurred while creating the datasource read request."+
+				"Please report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
 		return
 	}

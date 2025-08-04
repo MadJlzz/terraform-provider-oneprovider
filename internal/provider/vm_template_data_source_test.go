@@ -39,7 +39,7 @@ func TestAccVMTemplateDataSource(t *testing.T) {
 			},
 			{
 				Config:      testAccVMTemplateDontExistDataSourceConfig,
-				ExpectError: regexp.MustCompile("Unable to get template by name"),
+				ExpectError: regexp.MustCompile("template not found for name random-name-that-does-not-exist"),
 			},
 		},
 	})
