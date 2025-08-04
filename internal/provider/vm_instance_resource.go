@@ -177,8 +177,26 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 }
 
 func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	//TODO implement me
-	panic("update resource is not supported yet")
+	var data *vmInstanceResourceModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	updateRequest := &api.VMInstanceUpdateRequest{
+		VMId:     data.ID.ValueString(),
+		Hostname: data.Hostname.ValueString(),
+	}
+
+	_, err := r.svc.UpdateVMInstance(ctx, updateRequest)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to update VM instance",
+			err.Error(),
+		)
+		return
+	}
+
+	data.Hostname = types.StringValue(updateRequest.Hostname)
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

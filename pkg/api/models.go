@@ -110,3 +110,23 @@ type VMInstanceReadResponse struct {
 	} `json:"response"`
 	Error *ApiError `json:"error"`
 }
+
+type VMInstanceUpdateRequest struct {
+	VMId     string `json:"vm_id"`
+	Hostname string `json:"hostname"`
+}
+
+func (v *VMInstanceUpdateRequest) HostnameUrlValues() url.Values {
+	return url.Values{
+		"vm_id":    {v.VMId},
+		"hostname": {v.Hostname},
+	}
+}
+
+type VMInstanceUpdateResponse struct {
+	Result   string `json:"result"`
+	Response struct {
+		Message string `json:"message"`
+	} `json:"response"`
+	Error *ApiError `json:"error"`
+}

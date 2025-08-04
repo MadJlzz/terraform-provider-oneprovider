@@ -79,6 +79,21 @@ func (s *OneProvider) CreateVMInstance(ctx context.Context, req *VMInstanceCreat
 	return &response, nil
 }
 
+func (s *OneProvider) UpdateVMInstance(ctx context.Context, req *VMInstanceUpdateRequest) (*VMInstanceUpdateResponse, error) {
+	var response VMInstanceUpdateResponse
+
+	if strings.TrimSpace(req.Hostname) == "" {
+		return nil, fmt.Errorf("hostname cannot be empty")
+	}
+
+	err := s.makeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.HostnameUrlValues().Encode()), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (s *OneProvider) DestroyVMInstance(ctx context.Context, req *VMInstanceDestroyRequest) (*VMInstanceDestroyResponse, error) {
 	var response VMInstanceDestroyResponse
 
