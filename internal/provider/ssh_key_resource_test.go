@@ -10,7 +10,7 @@ import (
 
 const testAccSshKeyResource = `
 resource "oneprovider_ssh_key" "key" {
-	name       = "frodos_house"
+	name       = "frodoshouse"
 	public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMbAn3/YgZhhmsQIiGjOPOhODxpKXUo+LF3rFBvOOnYl"
 }
 `

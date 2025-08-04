@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/ssh"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"regexp"
 )
 
 var (
@@ -63,6 +66,12 @@ func (r *sshKeyResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			"name": schema.StringAttribute{
 				Description: "Name of the SSH key resource.",
 				Required:    true,
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`^[a-z0-9]*$`),
+						"must only contain only alphabetic characters",
+					),
+				},
 			},
 			"public_key": schema.StringAttribute{
 				Description: "Public key value.",
