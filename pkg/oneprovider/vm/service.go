@@ -18,13 +18,13 @@ func NewService(c *client.Client) *Service {
 	return &Service{client: c}
 }
 
-func (s *Service) GetTemplateByName(ctx context.Context, name string) (*TemplateResponse, error) {
-	var response ListTemplatesResponse
+func (s *Service) GetTemplateByName(ctx context.Context, name string) (*TemplateReadResponse, error) {
+	var response TemplatesListResponse
 	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/templates/", nil, &response)
 	if err != nil {
 		return nil, err
 	}
-	tpl, found := common.FindElement(response.Templates, func(t TemplateResponse) bool {
+	tpl, found := common.FindElement(response.Templates, func(t TemplateReadResponse) bool {
 		return strings.EqualFold(t.Name, name)
 	})
 	if !found {
@@ -33,14 +33,14 @@ func (s *Service) GetTemplateByName(ctx context.Context, name string) (*Template
 	return &tpl, nil
 }
 
-func (s *Service) GetLocationByCity(ctx context.Context, city string) (*LocationResponse, error) {
-	var response ListLocationsResponse
+func (s *Service) GetLocationByCity(ctx context.Context, city string) (*LocationReadResponse, error) {
+	var response LocationsListResponse
 	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/locations", nil, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	findCityFn := func(l LocationResponse) bool { return l.City == city }
+	findCityFn := func(l LocationReadResponse) bool { return l.City == city }
 
 	for _, regions := range response.Response {
 		location, found := common.FindElement(regions, findCityFn)
