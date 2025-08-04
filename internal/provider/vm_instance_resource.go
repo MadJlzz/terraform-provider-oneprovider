@@ -89,6 +89,9 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Description: "Password of the root user",
 				Computed:    true,
 				Sensitive:   true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
