@@ -4,8 +4,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 	"testing"
+	"time"
 )
 
 const testAccVmInstanceResource = `
@@ -30,6 +32,10 @@ func TestAccVmInstanceResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		CheckDestroy: func(state *terraform.State) error {
+			time.Sleep(time.Second * 30)
+			return nil
+		},
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
@@ -69,6 +75,9 @@ func TestAccVmInstanceResource(t *testing.T) {
 			},
 			{
 				Config: testAccVmInstanceResourceUpdate,
+				PreConfig: func() {
+					time.Sleep(time.Second * 10)
+				},
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
