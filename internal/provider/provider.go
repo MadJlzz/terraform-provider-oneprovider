@@ -133,6 +133,7 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewVmInstanceResource,
+		NewSSHKeyResource,
 	}
 }
 
