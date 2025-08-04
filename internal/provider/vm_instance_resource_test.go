@@ -33,6 +33,11 @@ func TestAccVmInstanceResource(t *testing.T) {
 					),
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
+						tfjsonpath.New("ip_address"),
+						knownvalue.NotNull(),
+					),
+					statecheck.ExpectKnownValue(
+						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("location_id"),
 						knownvalue.StringExact("34"),
 					),

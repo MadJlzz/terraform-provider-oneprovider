@@ -98,3 +98,15 @@ type VMInstanceDestroyResponse struct {
 	} `json:"response"`
 	Error *ApiError `json:"error"`
 }
+
+type VMInstanceReadResponse struct {
+	Result   string `json:"result"`
+	Response struct {
+		ServerInfo struct {
+			IpAddress string `json:"ipaddress"`
+			Hostname  string `json:"hostname"`
+			City      string `json:"city"`
+		} `json:"server_info"`
+	} `json:"response"`
+	Error *ApiError `json:"error"`
+}

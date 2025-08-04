@@ -58,6 +58,16 @@ func (s *OneProvider) GetLocationByCity(ctx context.Context, city string) (*VMLo
 	return nil, fmt.Errorf("location not found for city %s", city)
 }
 
+func (s *OneProvider) GetVMInstanceByID(ctx context.Context, id string) (*VMInstanceReadResponse, error) {
+	var response VMInstanceReadResponse
+	err := s.makeAPICall(ctx, http.MethodGet, fmt.Sprintf("/vm/info/%s", id), nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (s *OneProvider) CreateVMInstance(ctx context.Context, req *VMInstanceCreateRequest) (*VMInstanceCreateResponse, error) {
 	var response VMInstanceCreateResponse
 
