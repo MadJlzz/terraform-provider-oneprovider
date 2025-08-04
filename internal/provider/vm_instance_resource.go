@@ -28,6 +28,7 @@ type vmInstanceResourceModel struct {
 	TemplateId     types.String `tfsdk:"template_id"`
 	Hostname       types.String `tfsdk:"hostname"`
 	IPAddress      types.String `tfsdk:"ip_address"`
+	Password       types.String `tfsdk:"password"`
 }
 
 func NewVmInstanceResource() resource.Resource {
@@ -84,6 +85,11 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"password": schema.StringAttribute{
+				Description: "Password of the root user",
+				Computed:    true,
+				Sensitive:   true,
+			},
 		},
 	}
 }
@@ -135,6 +141,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 
 	data.ID = types.StringValue(vm.Response.Id)
 	data.IPAddress = types.StringValue(vm.Response.IpAddress)
+	data.Password = types.StringValue(vm.Response.Password)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
