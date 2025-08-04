@@ -70,7 +70,7 @@ func (ds *vmTemplateDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	tpl, err := ds.svc.GetTemplateByName(ctx, name)
+	tpl, err := ds.svc.VM.GetTemplateByName(ctx, name)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to get template by name",

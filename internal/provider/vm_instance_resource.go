@@ -3,7 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/api"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -18,7 +19,7 @@ var (
 )
 
 type vmInstanceResource struct {
-	svc *api.OneProvider
+	svc *oneprovider.OneProvider
 }
 
 type vmInstanceResourceModel struct {
@@ -104,7 +105,7 @@ func (r *vmInstanceResource) Configure(ctx context.Context, req resource.Configu
 		return
 	}
 	tflog.Info(ctx, "configuring datasource dependencies")
-	svc, ok := req.ProviderData.(*api.OneProvider)
+	svc, ok := req.ProviderData.(*oneprovider.OneProvider)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
@@ -127,13 +128,13 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	locationId, _ := strconv.Atoi(data.LocationId.ValueString())
 	instanceSizeId, _ := strconv.Atoi(data.InstanceSizeId.ValueString())
 
-	createRequest := &api.VMInstanceCreateRequest{
+	createRequest := &vm.InstanceCreateRequest{
 		LocationId:     locationId,
 		InstanceSizeId: instanceSizeId,
 		TemplateId:     data.TemplateId.ValueString(),
 		Hostname:       data.Hostname.ValueString(),
 	}
-	vm, err := r.svc.CreateVMInstance(ctx, createRequest)
+	vmInstance, err := r.svc.VM.CreateInstance(ctx, createRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create VM instance",
@@ -142,9 +143,9 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	data.ID = types.StringValue(vm.Response.Id)
-	data.IPAddress = types.StringValue(vm.Response.IpAddress)
-	data.Password = types.StringValue(vm.Response.Password)
+	data.ID = types.StringValue(vmInstance.Response.Id)
+	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
+	data.Password = types.StringValue(vmInstance.Response.Password)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -154,7 +155,7 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
-	info, err := r.svc.GetVMInstanceByID(ctx, data.ID.ValueString())
+	info, err := r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to get VM instance by ID",
@@ -190,12 +191,12 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	var data *vmInstanceResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
-	updateRequest := &api.VMInstanceUpdateRequest{
+	updateRequest := &vm.InstanceUpdateRequest{
 		VMId:     data.ID.ValueString(),
 		Hostname: data.Hostname.ValueString(),
 	}
 
-	_, err := r.svc.UpdateVMInstance(ctx, updateRequest)
+	_, err := r.svc.VM.UpdateInstance(ctx, updateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to update VM instance",
@@ -217,12 +218,12 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	destroyRequest := &api.VMInstanceDestroyRequest{
+	destroyRequest := &vm.InstanceDestroyRequest{
 		VMId:         data.ID.ValueString(),
 		ConfirmClose: true,
 	}
 
-	_, err := r.svc.DestroyVMInstance(ctx, destroyRequest)
+	_, err := r.svc.VM.DestroyInstance(ctx, destroyRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to destroy VM instance",

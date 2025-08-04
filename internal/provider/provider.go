@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/api"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -116,7 +116,7 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	svc, err := api.NewService(endpoint, apiKey, clientKey)
+	svc, err := oneprovider.NewService(endpoint, apiKey, clientKey)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create OneProvider API client",

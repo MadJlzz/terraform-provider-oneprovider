@@ -1,0 +1,99 @@
+package vm
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
+)
+
+type Service struct {
+	client *client.Client
+}
+
+func NewService(c *client.Client) *Service {
+	return &Service{client: c}
+}
+
+func (s *Service) GetTemplateByName(ctx context.Context, name string) (*TemplateResponse, error) {
+	var response ListTemplatesResponse
+	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/templates/", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	tpl, found := common.FindElement(response.Templates, func(t TemplateResponse) bool {
+		return strings.EqualFold(t.Name, name)
+	})
+	if !found {
+		return nil, fmt.Errorf("template not found for name %s", name)
+	}
+	return &tpl, nil
+}
+
+func (s *Service) GetLocationByCity(ctx context.Context, city string) (*LocationResponse, error) {
+	var response ListLocationsResponse
+	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/locations", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	findCityFn := func(l LocationResponse) bool { return l.City == city }
+
+	for _, regions := range response.Response {
+		location, found := common.FindElement(regions, findCityFn)
+		if found {
+			return &location, nil
+		}
+	}
+	return nil, fmt.Errorf("location not found for city %s", city)
+}
+
+func (s *Service) GetInstanceByID(ctx context.Context, id string) (*InstanceReadResponse, error) {
+	var response InstanceReadResponse
+	err := s.client.MakeAPICall(ctx, http.MethodGet, fmt.Sprintf("/vm/info/%s", id), nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (s *Service) CreateInstance(ctx context.Context, req *InstanceCreateRequest) (*InstanceCreateResponse, error) {
+	var response InstanceCreateResponse
+
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/create", strings.NewReader(req.UrlValues().Encode()), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (s *Service) UpdateInstance(ctx context.Context, req *InstanceUpdateRequest) (*InstanceUpdateResponse, error) {
+	var response InstanceUpdateResponse
+
+	if strings.TrimSpace(req.Hostname) == "" {
+		return nil, fmt.Errorf("hostname cannot be empty")
+	}
+
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.HostnameUrlValues().Encode()), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyRequest) (*InstanceDestroyResponse, error) {
+	var response InstanceDestroyResponse
+
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/destroy", strings.NewReader(req.UrlValues().Encode()), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

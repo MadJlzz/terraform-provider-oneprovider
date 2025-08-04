@@ -1,4 +1,4 @@
-package api
+package vm
 
 import (
 	"net/url"
@@ -10,14 +10,14 @@ type ApiError struct {
 	Message string `json:"message"`
 }
 
-type VMInstanceCreateRequest struct {
+type InstanceCreateRequest struct {
 	LocationId     int    `json:"location_id"`
 	InstanceSizeId int    `json:"instance_size"`
 	TemplateId     string `json:"template"`
 	Hostname       string `json:"hostname"`
 }
 
-func (v *VMInstanceCreateRequest) UrlValues() url.Values {
+func (v *InstanceCreateRequest) UrlValues() url.Values {
 	return url.Values{
 		"location_id":   {strconv.Itoa(v.LocationId)},
 		"instance_size": {strconv.Itoa(v.InstanceSizeId)},
@@ -26,7 +26,7 @@ func (v *VMInstanceCreateRequest) UrlValues() url.Values {
 	}
 }
 
-type VMInstanceCreateResponse struct {
+type InstanceCreateResponse struct {
 	Result   string `json:"result"`
 	Response struct {
 		Message   string `json:"message"`
@@ -38,11 +38,11 @@ type VMInstanceCreateResponse struct {
 	Error *ApiError `json:"error"`
 }
 
-type ListVMTemplatesResponse struct {
-	Templates []VMTemplateResponse `json:"response"`
+type ListTemplatesResponse struct {
+	Templates []TemplateResponse `json:"response"`
 }
 
-type VMTemplateResponse struct {
+type TemplateResponse struct {
 	Id      int    `json:"id"`
 	Name    string `json:"name"`
 	Size    string `json:"size"`
@@ -54,13 +54,13 @@ type VMTemplateResponse struct {
 	}
 }
 
-type ListVMLocationsResponse struct {
-	Result   string                          `json:"result"`
-	Response map[string][]VMLocationResponse `json:"response"`
-	Error    *ApiError                       `json:"error"`
+type ListLocationsResponse struct {
+	Result   string                        `json:"result"`
+	Response map[string][]LocationResponse `json:"response"`
+	Error    *ApiError                     `json:"error"`
 }
 
-type VMLocationResponse struct {
+type LocationResponse struct {
 	Id             string               `json:"id"`
 	Region         string               `json:"region"`
 	Country        string               `json:"country"`
@@ -75,19 +75,19 @@ type AvailableIPsResponse struct {
 	IPv6 string `json:"ipv6"`
 }
 
-type VMInstanceDestroyRequest struct {
+type InstanceDestroyRequest struct {
 	VMId         string `json:"vm_id"`
 	ConfirmClose bool   `json:"confirm_close"`
 }
 
-func (v *VMInstanceDestroyRequest) UrlValues() url.Values {
+func (v *InstanceDestroyRequest) UrlValues() url.Values {
 	return url.Values{
 		"vm_id":         {v.VMId},
 		"confirm_close": {strconv.FormatBool(v.ConfirmClose)},
 	}
 }
 
-type VMInstanceDestroyResponse struct {
+type InstanceDestroyResponse struct {
 	Result   string `json:"result"`
 	Response struct {
 		Message                  string `json:"message"`
@@ -99,7 +99,7 @@ type VMInstanceDestroyResponse struct {
 	Error *ApiError `json:"error"`
 }
 
-type VMInstanceReadResponse struct {
+type InstanceReadResponse struct {
 	Result   string `json:"result"`
 	Response struct {
 		ServerInfo struct {
@@ -111,19 +111,19 @@ type VMInstanceReadResponse struct {
 	Error *ApiError `json:"error"`
 }
 
-type VMInstanceUpdateRequest struct {
+type InstanceUpdateRequest struct {
 	VMId     string `json:"vm_id"`
 	Hostname string `json:"hostname"`
 }
 
-func (v *VMInstanceUpdateRequest) HostnameUrlValues() url.Values {
+func (v *InstanceUpdateRequest) HostnameUrlValues() url.Values {
 	return url.Values{
 		"vm_id":    {v.VMId},
 		"hostname": {v.Hostname},
 	}
 }
 
-type VMInstanceUpdateResponse struct {
+type InstanceUpdateResponse struct {
 	Result   string `json:"result"`
 	Response struct {
 		Message string `json:"message"`

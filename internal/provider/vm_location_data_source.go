@@ -105,7 +105,7 @@ func (ds *vmLocationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		"city": city,
 	})
 
-	l, err := ds.svc.GetLocationByCity(ctx, city)
+	l, err := ds.svc.VM.GetLocationByCity(ctx, city)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("unable to get vm location data for city %s", city),
