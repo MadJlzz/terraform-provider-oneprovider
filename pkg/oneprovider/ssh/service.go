@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -25,4 +26,15 @@ func (s *Service) Create(ctx context.Context, req *CreateSSHKeyRequest) (*Create
 	}
 
 	return &resp, nil
+}
+
+func (s *Service) Destroy(ctx context.Context, uuid string) error {
+	data := url.Values{"ssh_key": {uuid}}
+
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/sshkey/delete", strings.NewReader(data.Encode()), nil)
+	if err != nil {
+		return fmt.Errorf("ssh: destroy ssh key failed: %w", err)
+	}
+
+	return nil
 }

@@ -120,15 +120,31 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 
 func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	//TODO implement me
-	panic("implement me")
+	tflog.Warn(ctx, "Not yet implemented")
 }
 
 func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//TODO implement me
-	panic("implement me")
+	tflog.Warn(ctx, "Not yet implemented")
 }
 
 func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	//TODO implement me
-	panic("implement me")
+	var data sshKeyResourceModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	err := r.svc.SSH.Destroy(ctx, data.Id.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to destroy resource",
+			"An unexpected error occurred while attempting to destroy the resource. "+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
+		)
+		return
+	}
+
 }

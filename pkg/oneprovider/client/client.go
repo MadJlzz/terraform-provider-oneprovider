@@ -41,9 +41,9 @@ func NewClient(endpoint, apiKey, clientKey string) (*Client, error) {
 func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body io.Reader, result any) error {
 	// Since we always have a response tied to an API call
 	// we're return earlier to prevent development bugs.
-	if result == nil {
-		return fmt.Errorf("client: result parameter cannot be nil for API calls that return JSON")
-	}
+	//if result == nil {
+	//	return fmt.Errorf("client: result parameter cannot be nil for API calls that return JSON")
+	//}
 
 	requestURL := fmt.Sprintf("%s%s", c.endpoint, endpoint)
 	req, err := http.NewRequestWithContext(ctx, method, requestURL, body)
@@ -93,9 +93,11 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 		return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
 	}
 
-	// No API error found, decode into the result interface
-	if decodeErr := json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(result); decodeErr != nil {
-		return fmt.Errorf("client: failed to decode response: %w", decodeErr)
+	if result != nil {
+		// No API error found, decode into the result interface
+		if decodeErr := json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(result); decodeErr != nil {
+			return fmt.Errorf("client: failed to decode response: %w", decodeErr)
+		}
 	}
 
 	return nil
