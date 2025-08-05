@@ -83,7 +83,7 @@ func (r *sshKeyResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			},
 			// Outputs
 			"id": schema.StringAttribute{
-				Description: "Id in a UUID for of the SSH key object.",
+				Description: "UUID of the SSH key resource.",
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
