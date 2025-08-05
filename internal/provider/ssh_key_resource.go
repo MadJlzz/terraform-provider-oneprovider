@@ -34,7 +34,7 @@ func NewSSHKeyResource() resource.Resource {
 	return &sshKeyResource{}
 }
 
-// TODO: refactor this since it's duplicated with configure from vm_instance_resource
+// TODO: refactor this since it's duplicated with configure from vm_instance_resource.
 func (r *sshKeyResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Always perform a nil check when handling ProviderData because Terraform
 	// sets that data after it calls the ConfigureProvider RPC.
@@ -76,6 +76,9 @@ func (r *sshKeyResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			"public_key": schema.StringAttribute{
 				Description: "Public key value.",
 				Required:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			// Outputs
 			"id": schema.StringAttribute{
@@ -97,7 +100,7 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	createReq := &ssh.CreateSSHKeyRequest{
+	createReq := &ssh.SshKeyCreateRequest{
 		Name:      data.Name.ValueString(),
 		PublicKey: data.PublicKey.ValueString(),
 	}
@@ -113,19 +116,67 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	data.Id = types.StringValue(sshKey.Response.Key.UUID)
+	data.Id = types.StringValue(sshKey.Response.Key.Uuid)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	//TODO implement me
-	tflog.Warn(ctx, "Not yet implemented")
+	var data *sshKeyResourceModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	info, err := r.svc.SSH.GetByID(ctx, data.Id.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to refresh resource",
+			"An unexpected error occurred while attempting to refresh the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
+		)
+		return
+	}
+
+	data.Name = types.StringValue(info.Name)
+	data.PublicKey = types.StringValue(info.Value)
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	//TODO implement me
-	tflog.Warn(ctx, "Not yet implemented")
+	var data sshKeyResourceModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	updateReq := &ssh.SshKeyUpdateRequest{
+		Uuid:      data.Id.ValueString(),
+		Name:      data.Name.ValueString(),
+		PublicKey: data.PublicKey.ValueString(),
+	}
+
+	_, err := r.svc.SSH.Update(ctx, updateReq)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to update resource",
+			"An unexpected error occurred while attempting to update the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
+		)
+		return
+	}
+
+	// For whatever reason, OneProvider is returning and empty object
+	// so we cannot use the actual response to update our state.
+	// I need to trust here that the update went well, and will set the state
+	// with the data of the request.
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

@@ -180,7 +180,7 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	updateRequest := &vm.InstanceUpdateRequest{
-		VMId:     data.ID.ValueString(),
+		VmId:     data.ID.ValueString(),
 		Hostname: data.Hostname.ValueString(),
 	}
 
@@ -217,7 +217,7 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	destroyRequest := &vm.InstanceDestroyRequest{
-		VMId:         data.ID.ValueString(),
+		VmId:         data.ID.ValueString(),
 		ConfirmClose: true,
 	}
 

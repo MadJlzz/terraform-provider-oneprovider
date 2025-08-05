@@ -75,13 +75,13 @@ type InstanceCreateResponse struct {
 }
 
 type InstanceUpdateRequest struct {
-	VMId     string `json:"vm_id"`
+	VmId     string `json:"vm_id"`
 	Hostname string `json:"hostname"`
 }
 
 func (v *InstanceUpdateRequest) HostnameUrlValues() url.Values {
 	return url.Values{
-		"vm_id":    {v.VMId},
+		"vm_id":    {v.VmId},
 		"hostname": {v.Hostname},
 	}
 }
@@ -93,13 +93,13 @@ type InstanceUpdateResponse struct {
 }
 
 type InstanceDestroyRequest struct {
-	VMId         string `json:"vm_id"`
+	VmId         string `json:"vm_id"`
 	ConfirmClose bool   `json:"confirm_close"`
 }
 
 func (v *InstanceDestroyRequest) UrlValues() url.Values {
 	return url.Values{
-		"vm_id":         {v.VMId},
+		"vm_id":         {v.VmId},
 		"confirm_close": {strconv.FormatBool(v.ConfirmClose)},
 	}
 }
