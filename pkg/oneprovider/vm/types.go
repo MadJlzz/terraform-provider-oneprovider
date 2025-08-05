@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"fmt"
 	"net/url"
 	"strconv"
 )
@@ -49,19 +50,25 @@ type InstanceReadResponse struct {
 }
 
 type InstanceCreateRequest struct {
-	LocationId     int    `json:"location_id"`
-	InstanceSizeId int    `json:"instance_size"`
-	TemplateId     string `json:"template"`
-	Hostname       string `json:"hostname"`
+	LocationId     int      `json:"location_id"`
+	InstanceSizeId int      `json:"instance_size"`
+	TemplateId     string   `json:"template"`
+	Hostname       string   `json:"hostname"`
+	SshKeys        []string `json:"ssh_keys"`
 }
 
 func (v *InstanceCreateRequest) UrlValues() url.Values {
-	return url.Values{
+	urlValues := url.Values{
 		"location_id":   {strconv.Itoa(v.LocationId)},
 		"instance_size": {strconv.Itoa(v.InstanceSizeId)},
 		"template":      {v.TemplateId},
 		"hostname":      {v.Hostname},
 	}
+	for idx, key := range v.SshKeys {
+		//urlValues.Add(fmt.Sprintf("keys[%d]", idx), key)
+		urlValues.Add(fmt.Sprintf("ssh_keys[%d]", idx), key)
+	}
+	return urlValues
 }
 
 type InstanceCreateResponse struct {

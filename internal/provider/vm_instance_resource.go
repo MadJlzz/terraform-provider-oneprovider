@@ -6,8 +6,10 @@ import (
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -31,6 +33,7 @@ type vmInstanceResourceModel struct {
 	Hostname       types.String `tfsdk:"hostname"`
 	IPAddress      types.String `tfsdk:"ip_address"`
 	Password       types.String `tfsdk:"password"`
+	SshKeys        types.List   `tfsdk:"ssh_keys"`
 }
 
 func NewVmInstanceResource() resource.Resource {
@@ -71,6 +74,19 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 			"hostname": schema.StringAttribute{
 				Description: "Hostname of the VM instance",
 				Required:    true,
+			},
+			"ssh_keys": schema.ListAttribute{
+				Description: "List of SSH keys UUID to add to the VM instance.",
+				ElementType: types.StringType,
+				// Schema Using Attribute Default must be computed when using default.
+				Computed: true,
+				Optional: true,
+				Default: listdefault.StaticValue(
+					types.ListValueMust(
+						types.StringType,
+						[]attr.Value{},
+					),
+				),
 			},
 			// Outputs
 			"id": schema.StringAttribute{
@@ -129,11 +145,18 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	locationId, _ := strconv.Atoi(data.LocationId.ValueString())
 	instanceSizeId, _ := strconv.Atoi(data.InstanceSizeId.ValueString())
 
+	var sshKeys []string
+	resp.Diagnostics.Append(data.SshKeys.ElementsAs(ctx, &sshKeys, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	createRequest := &vm.InstanceCreateRequest{
 		LocationId:     locationId,
 		InstanceSizeId: instanceSizeId,
 		TemplateId:     data.TemplateId.ValueString(),
 		Hostname:       data.Hostname.ValueString(),
+		SshKeys:        sshKeys,
 	}
 	vmInstance, err := r.svc.VM.CreateInstance(ctx, createRequest)
 	if err != nil {
