@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -180,7 +181,7 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	updateRequest := &vm.InstanceUpdateRequest{
-		VMId:     data.ID.ValueString(),
+		VmId:     data.ID.ValueString(),
 		Hostname: data.Hostname.ValueString(),
 	}
 
@@ -195,15 +196,27 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	// TODO: not sure yet why this happens but essential
-	if data.Hostname.ValueString() != updateRequest.Hostname {
+	info, err := common.WithRetryUntilValid(
+		ctx,
+		common.DefaultRetryConfig(),
+		func(ctx context.Context) (*vm.InstanceReadResponse, error) {
+			return r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
+		},
+		func(vm *vm.InstanceReadResponse) bool {
+			return vm.Response.ServerInfo.Hostname == data.Hostname.ValueString()
+		},
+	)
+	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to update resource",
-			"The hostname of the VM instance has been updated but the state is not up to date.",
+			"Unable to refresh resource after update",
+			"The update succeeded but failed to refresh the resource state."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
 		)
+		return
 	}
 
-	data.Hostname = types.StringValue(updateRequest.Hostname)
+	data.Hostname = types.StringValue(info.Response.ServerInfo.Hostname)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -217,7 +230,7 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	destroyRequest := &vm.InstanceDestroyRequest{
-		VMId:         data.ID.ValueString(),
+		VmId:         data.ID.ValueString(),
 		ConfirmClose: true,
 	}
 
