@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-// RetryConfig defines configuration for retry behavior
+// RetryConfig defines configuration for retry behavior.
 type RetryConfig struct {
 	MaxRetries    int
 	InitialDelay  time.Duration
@@ -16,7 +16,7 @@ type RetryConfig struct {
 	BackoffFactor float64
 }
 
-// DefaultRetryConfig returns sensible defaults for OneProvider's eventual consistency
+// DefaultRetryConfig returns sensible defaults for OneProvider's eventual consistency.
 func DefaultRetryConfig() RetryConfig {
 	return RetryConfig{
 		MaxRetries:    8,
@@ -30,11 +30,11 @@ func DefaultRetryConfig() RetryConfig {
 // It should return (result, shouldRetry, error)
 // - result: the result of the operation (only used if shouldRetry is false and error is nil)
 // - shouldRetry: true if the operation should be retried, false if it succeeded or failed permanently
-// - error: any error that occurred
+// - error: any error that occurred.
 type RetryableFunc[T any] func(ctx context.Context, attempt int) (result T, shouldRetry bool, err error)
 
 // WithRetry executes a function with exponential backoff retry logic
-// The function will be retried until it succeeds, fails permanently, or timeout is reached
+// The function will be retried until it succeeds, fails permanently, or timeout is reached.
 func WithRetry[T any](ctx context.Context, config RetryConfig, operation RetryableFunc[T]) (T, error) {
 	var zero T
 	delay := config.InitialDelay
@@ -87,13 +87,13 @@ func WithRetry[T any](ctx context.Context, config RetryConfig, operation Retryab
 	return zero, fmt.Errorf("operation failed after %d attempts", config.MaxRetries)
 }
 
-// WithRetryUntilValid is a convenience wrapper for operations that need to retry until validation passes
-// It takes an operation function and a validation function
+// WithRetryUntilValid retries an operation until validation passes or MaxRetries is reached
+// It will retry up to config.MaxRetries times with exponential backoff.
 func WithRetryUntilValid[T any](
 	ctx context.Context,
 	config RetryConfig,
 	operation func(ctx context.Context) (T, error),
-	validate func(result T) bool,
+	isValid func(result T) bool,
 ) (T, error) {
 	return WithRetry(ctx, config, func(ctx context.Context, attempt int) (T, bool, error) {
 		result, err := operation(ctx)
@@ -103,8 +103,8 @@ func WithRetryUntilValid[T any](
 		}
 
 		// Check validation
-		if validate(result) {
-			return result, false, nil // Success, don't retry
+		if isValid(result) {
+			return result, false, nil
 		}
 
 		// Validation failed, retry
