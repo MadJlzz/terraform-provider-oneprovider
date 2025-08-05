@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/ssh"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -171,10 +172,30 @@ func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	// For whatever reason, OneProvider is returning and empty object
-	// so we cannot use the actual response to update our state.
-	// I need to trust here that the update went well, and will set the state
-	// with the data of the request.
+	// OneProvider backend needs time to apply changes, so we retry with backoff.
+	info, err := common.WithRetryUntilValid(
+		ctx,
+		common.DefaultRetryConfig(),
+		func(ctx context.Context) (*ssh.SshKeyReadResponse, error) {
+			return r.svc.SSH.GetByID(ctx, data.Id.ValueString())
+		},
+		func(result *ssh.SshKeyReadResponse) bool {
+			// Validate that the update has been applied
+			return result.Name == data.Name.ValueString()
+		},
+	)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to refresh resource after update",
+			"The update succeeded but failed to refresh the resource state."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
+		)
+		return
+	}
+
+	// PublicKey update is not supported at the moment.
+	data.Name = types.StringValue(info.Name)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -197,5 +218,4 @@ func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		)
 		return
 	}
-
 }
