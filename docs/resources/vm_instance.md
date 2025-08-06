@@ -51,7 +51,7 @@ resource "oneprovider_vm_instance" "vm" {
 
 ### Optional
 
-- `ssh_keys` (List of String) List of SSH keys UUID to add to the VM instance.
+- `ssh_keys` (List of String) List of SSH keys UUID to add to the VM instance. Note: The OneProvider API does not return SSH key information, so the state reflects the configured values rather than the actual server state.
 
 ### Read-Only
 

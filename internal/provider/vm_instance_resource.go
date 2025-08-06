@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
@@ -14,7 +15,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"strconv"
+	"strings"
+	"time"
 )
 
 var (
@@ -76,7 +80,7 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Required:    true,
 			},
 			"ssh_keys": schema.ListAttribute{
-				Description: "List of SSH keys UUID to add to the VM instance.",
+				Description: "List of SSH keys UUID to add to the VM instance. Note: The OneProvider API does not return SSH key information, so the state reflects the configured values rather than the actual server state.",
 				ElementType: types.StringType,
 				// Schema Using Attribute Default must be computed when using default.
 				Computed: true,
@@ -169,6 +173,33 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
+	err = retry.RetryContext(ctx, time.Duration(2)*time.Minute, func() *retry.RetryError {
+		info, infoErr := r.svc.VM.GetInstanceByID(ctx, vmInstance.Response.Id)
+		if infoErr != nil {
+			return retry.NonRetryableError(infoErr)
+		}
+		if info.Response.ServerInstall || strings.ToLower(info.Response.ServerState.State) == "offline" {
+			return retry.RetryableError(fmt.Errorf("vm instance not ready yet"))
+		}
+		if info.Response.ServerInfo.IpAddress == "" {
+			// This should never been happening because when I do the create - I get an IP back.
+			// The fact that from the GET endpoint, there is some cases where ServerInfo.* is filled with empty
+			// values means that something is wrong in their backend.
+			return retry.RetryableError(fmt.Errorf("getInstance returned empty informations"))
+		}
+		return nil
+	})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to refresh resource",
+			"An unexpected error occurred while attempting to refresh the resource."+
+				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				err.Error(),
+		)
+		return
+	}
+
+	// Set the value for computed attributes.
 	data.ID = types.StringValue(vmInstance.Response.Id)
 	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
 	data.Password = types.StringValue(vmInstance.Response.Password)
@@ -178,11 +209,14 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 
 func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data *vmInstanceResourceModel
-
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	info, err := r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
 	if err != nil {
+		if errors.Is(err, common.ErrVmNotFound) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError(
 			"Unable to refresh resource",
 			"An unexpected error occurred while attempting to refresh the resource."+
@@ -200,48 +234,53 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 }
 
 func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data *vmInstanceResourceModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	var state *vmInstanceResourceModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
-	updateRequest := &vm.InstanceUpdateRequest{
-		VmId:     data.ID.ValueString(),
-		Hostname: data.Hostname.ValueString(),
+	var plan *vmInstanceResourceModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+
+	// We are updating the hostname...
+	if state.Hostname != plan.Hostname {
+		updateRequest := &vm.InstanceHostnameUpdateRequest{
+			VmId:     plan.ID.ValueString(),
+			Hostname: plan.Hostname.ValueString(),
+		}
+
+		err := r.svc.VM.UpdateInstanceHostname(ctx, updateRequest)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to update resource",
+				"An unexpected error occurred while attempting to update the resource."+
+					"Please retry the operation or report this issue to the provider developers.\n\n"+
+					err.Error(),
+			)
+			return
+		}
+
+		err = retry.RetryContext(ctx, time.Duration(30)*time.Second, func() *retry.RetryError {
+			info, infoErr := r.svc.VM.GetInstanceByID(ctx, plan.ID.ValueString())
+			if infoErr != nil {
+				return retry.NonRetryableError(infoErr)
+			}
+			if info.Response.ServerInfo.Hostname != plan.Hostname.ValueString() {
+				return retry.RetryableError(fmt.Errorf("vm instance hostname not updated yet"))
+			}
+			return nil
+		})
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to refresh resource after update",
+				"The update succeeded but failed to refresh the resource state."+
+					"Please retry the operation or report this issue to the provider developers.\n\n"+
+					err.Error(),
+			)
+			return
+		}
+		plan.Hostname = types.StringValue(updateRequest.Hostname)
 	}
 
-	_, err := r.svc.VM.UpdateInstance(ctx, updateRequest)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to update resource",
-			"An unexpected error occurred while attempting to update the resource."+
-				"Please retry the operation or report this issue to the provider developers.\n\n"+
-				err.Error(),
-		)
-		return
-	}
-
-	info, err := common.WithRetryUntilValid(
-		ctx,
-		common.DefaultRetryConfig(),
-		func(ctx context.Context) (*vm.InstanceReadResponse, error) {
-			return r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
-		},
-		func(vm *vm.InstanceReadResponse) bool {
-			return vm.Response.ServerInfo.Hostname == data.Hostname.ValueString()
-		},
-	)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to refresh resource after update",
-			"The update succeeded but failed to refresh the resource state."+
-				"Please retry the operation or report this issue to the provider developers.\n\n"+
-				err.Error(),
-		)
-		return
-	}
-
-	data.Hostname = types.StringValue(info.Response.ServerInfo.Hostname)
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -257,7 +296,7 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 		ConfirmClose: true,
 	}
 
-	_, err := r.svc.VM.DestroyInstance(ctx, destroyRequest)
+	err := r.svc.VM.DestroyInstance(ctx, destroyRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to destroy resource",

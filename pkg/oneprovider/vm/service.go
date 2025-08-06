@@ -72,28 +72,18 @@ func (s *Service) CreateInstance(ctx context.Context, req *InstanceCreateRequest
 	return &response, nil
 }
 
-func (s *Service) UpdateInstance(ctx context.Context, req *InstanceUpdateRequest) (*InstanceUpdateResponse, error) {
-	var response InstanceUpdateResponse
-
-	if strings.TrimSpace(req.Hostname) == "" {
-		return nil, fmt.Errorf("vm: hostname cannot be empty")
-	}
-
-	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.HostnameUrlValues().Encode()), &response)
+func (s *Service) UpdateInstanceHostname(ctx context.Context, req *InstanceHostnameUpdateRequest) error {
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.HostnameUrlValues().Encode()), nil)
 	if err != nil {
-		return nil, fmt.Errorf("vm: update instance hostname failed: %w", err)
+		return fmt.Errorf("vm: update instance hostname failed: %w", err)
 	}
-
-	return &response, nil
+	return nil
 }
 
-func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyRequest) (*InstanceDestroyResponse, error) {
-	var response InstanceDestroyResponse
-
-	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/destroy", strings.NewReader(req.UrlValues().Encode()), &response)
+func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyRequest) error {
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/destroy", strings.NewReader(req.UrlValues().Encode()), nil)
 	if err != nil {
-		return nil, fmt.Errorf("vm: destroy instance failed: %w", err)
+		return fmt.Errorf("vm: destroy instance failed: %w", err)
 	}
-
-	return &response, nil
+	return nil
 }

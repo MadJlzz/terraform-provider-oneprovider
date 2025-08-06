@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 	"testing"
-	"time"
 )
 
 const testAccVmInstanceResource = `
@@ -75,9 +74,6 @@ func TestAccVmInstanceResource(t *testing.T) {
 			},
 			{
 				Config: testAccVmInstanceResourceUpdate,
-				PreConfig: func() {
-					time.Sleep(time.Second * 10)
-				},
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",

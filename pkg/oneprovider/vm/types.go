@@ -41,11 +41,16 @@ type LocationReadResponse struct {
 
 type InstanceReadResponse struct {
 	Response struct {
-		ServerInfo struct {
+		ServerInstall bool `json:"server_install"`
+		ServerInfo    struct {
 			IpAddress string `json:"ipaddress"`
 			Hostname  string `json:"hostname"`
 			City      string `json:"city"`
 		} `json:"server_info"`
+		ServerState struct {
+			Status string `json:"status"`
+			State  string `json:"state"`
+		} `json:"server_state"`
 	} `json:"response"`
 }
 
@@ -67,6 +72,7 @@ func (v *InstanceCreateRequest) UrlValues() url.Values {
 	for idx, key := range v.SshKeys {
 		//urlValues.Add(fmt.Sprintf("keys[%d]", idx), key)
 		urlValues.Add(fmt.Sprintf("ssh_keys[%d]", idx), key)
+		//urlValues.Add("ssh_keys", fmt.Sprintf("[%s]", key))
 	}
 	return urlValues
 }
@@ -81,22 +87,16 @@ type InstanceCreateResponse struct {
 	} `json:"response"`
 }
 
-type InstanceUpdateRequest struct {
+type InstanceHostnameUpdateRequest struct {
 	VmId     string `json:"vm_id"`
 	Hostname string `json:"hostname"`
 }
 
-func (v *InstanceUpdateRequest) HostnameUrlValues() url.Values {
+func (v *InstanceHostnameUpdateRequest) HostnameUrlValues() url.Values {
 	return url.Values{
 		"vm_id":    {v.VmId},
 		"hostname": {v.Hostname},
 	}
-}
-
-type InstanceUpdateResponse struct {
-	Response struct {
-		Message string `json:"message"`
-	} `json:"response"`
 }
 
 type InstanceDestroyRequest struct {
@@ -109,14 +109,4 @@ func (v *InstanceDestroyRequest) UrlValues() url.Values {
 		"vm_id":         {v.VmId},
 		"confirm_close": {strconv.FormatBool(v.ConfirmClose)},
 	}
-}
-
-type InstanceDestroyResponse struct {
-	Response struct {
-		Message                  string `json:"message"`
-		UsageHours               string `json:"usageHours"`
-		BandwidthOverusageInGB   string `json:"bandwidthOverusage"`
-		BandwidthOverusageCost   string `json:"bandwidthOverusageCost"`
-		AdditionalHoursForCharge string `json:"additionalHoursForCharge"`
-	} `json:"response"`
 }

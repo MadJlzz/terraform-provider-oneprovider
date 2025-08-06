@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"io"
 	"net/http"
 	"strings"
@@ -39,12 +40,6 @@ func NewClient(endpoint, apiKey, clientKey string) (*Client, error) {
 }
 
 func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body io.Reader, result any) error {
-	// Since we always have a response tied to an API call
-	// we're return earlier to prevent development bugs.
-	//if result == nil {
-	//	return fmt.Errorf("client: result parameter cannot be nil for API calls that return JSON")
-	//}
-
 	requestURL := fmt.Sprintf("%s%s", c.endpoint, endpoint)
 	req, err := http.NewRequestWithContext(ctx, method, requestURL, body)
 	if err != nil {
@@ -90,7 +85,12 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 
 	// If there is an error, we stop and return it.
 	if errorCheck.Error != nil {
-		return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
+		switch errorCheck.Error.Code {
+		case 42:
+			return common.ErrVmNotFound
+		default:
+			return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
+		}
 	}
 
 	if result != nil {

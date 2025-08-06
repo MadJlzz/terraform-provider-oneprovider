@@ -35,3 +35,26 @@ type SshKeyListResponse struct {
 		SshKeys []SshKeyReadResponse `json:"keys"`
 	} `json:"response"`
 }
+
+type SshKeyUpdateRequest struct {
+	Uuid      string `json:"uuid"`
+	Name      string `json:"name"`
+	PublicKey string `json:"value"`
+}
+
+func (v *SshKeyUpdateRequest) UrlValues() url.Values {
+	return url.Values{
+		"ssh_key":   {v.Uuid},
+		"key_name":  {v.Name},
+		"key_value": {v.PublicKey},
+	}
+}
+
+type SshKeyUpdateResponse struct {
+	Response struct {
+		SshKeys []struct {
+			Name      string `json:"name"`
+			PublicKey string `json:"value"`
+		}
+	}
+}
