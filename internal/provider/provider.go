@@ -2,11 +2,12 @@ package provider
 
 import (
 	"context"
+	"os"
+
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -141,6 +142,7 @@ func (p *OneProvider) DataSources(ctx context.Context) []func() datasource.DataS
 	return []func() datasource.DataSource{
 		NewVmTemplateDataSource,
 		NewVMLocationDataSource,
+		NewSSHKeyDataSource,
 	}
 }
 

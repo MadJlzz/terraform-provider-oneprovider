@@ -3,11 +3,12 @@ package ssh
 import (
 	"context"
 	"fmt"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 )
 
 type Service struct {
@@ -32,6 +33,22 @@ func (s *Service) GetByID(ctx context.Context, id string) (*SshKeyReadResponse, 
 
 	if !found {
 		return nil, fmt.Errorf("ssh: key not found for id %s", id)
+	}
+
+	return &key, nil
+}
+
+func (s *Service) GetByName(ctx context.Context, name string) (*SshKeyReadResponse, error) {
+	var resp SshKeyListResponse
+
+	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/sshkeys/list", nil, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("ssh: list ssh keys failed: %w", err)
+	}
+	key, found := common.FindElement(resp.Response.SshKeys, func(k SshKeyReadResponse) bool { return name == k.Name })
+
+	if !found {
+		return nil, fmt.Errorf("ssh: key not found for name %s", name)
 	}
 
 	return &key, nil
