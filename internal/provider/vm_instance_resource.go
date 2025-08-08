@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,11 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"strconv"
-	"strings"
-	"time"
 )
 
 var (
@@ -26,7 +25,7 @@ var (
 )
 
 type vmInstanceResource struct {
-	svc *oneprovider.Service
+	resourceServiceInjector
 }
 
 type vmInstanceResourceModel struct {
@@ -117,24 +116,6 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 		},
 	}
-}
-
-func (r *vmInstanceResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Always perform a nil check when handling ProviderData because Terraform
-	// sets that data after it calls the ConfigureProvider RPC.
-	if req.ProviderData == nil {
-		return
-	}
-	tflog.Info(ctx, "configuring datasource dependencies")
-	svc, ok := req.ProviderData.(*oneprovider.Service)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected service type",
-			fmt.Sprintf("Expected oneprovider.Service, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return
-	}
-	r.svc = svc
 }
 
 func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {

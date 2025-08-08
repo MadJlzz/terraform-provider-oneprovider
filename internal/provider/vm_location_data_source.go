@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -9,12 +10,11 @@ import (
 )
 
 var (
-	_ datasource.DataSource              = &vmLocationDataSource{}
 	_ datasource.DataSourceWithConfigure = &vmLocationDataSource{}
 )
 
 type vmLocationDataSource struct {
-	baseDatasource
+	datasourceServiceInjector
 }
 
 type vmLocationDataSourceModel struct {

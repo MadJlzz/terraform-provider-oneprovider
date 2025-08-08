@@ -3,7 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
+	"regexp"
+	"time"
+
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/ssh"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -12,10 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"regexp"
-	"time"
 )
 
 var (
@@ -23,7 +22,7 @@ var (
 )
 
 type sshKeyResource struct {
-	svc *oneprovider.Service
+	resourceServiceInjector
 }
 
 type sshKeyResourceModel struct {
@@ -34,25 +33,6 @@ type sshKeyResourceModel struct {
 
 func NewSSHKeyResource() resource.Resource {
 	return &sshKeyResource{}
-}
-
-// TODO: refactor this since it's duplicated with configure from vm_instance_resource.
-func (r *sshKeyResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Always perform a nil check when handling ProviderData because Terraform
-	// sets that data after it calls the ConfigureProvider RPC.
-	if req.ProviderData == nil {
-		return
-	}
-	tflog.Info(ctx, "configuring datasource dependencies")
-	svc, ok := req.ProviderData.(*oneprovider.Service)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected service type",
-			fmt.Sprintf("Expected oneprovider.Service, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return
-	}
-	r.svc = svc
 }
 
 func (r *sshKeyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

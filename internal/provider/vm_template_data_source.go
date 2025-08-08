@@ -2,19 +2,20 @@ package provider
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"strconv"
 )
 
 var (
-	_ datasource.DataSource = &vmTemplateDataSource{}
+	_ datasource.DataSourceWithConfigure = &vmTemplateDataSource{}
 )
 
 type vmTemplateDataSource struct {
-	baseDatasource
+	datasourceServiceInjector
 }
 
 type vmTemplateDataSourceModel struct {
