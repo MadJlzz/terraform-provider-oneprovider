@@ -1,18 +1,19 @@
 package provider
 
 import (
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
-	"testing"
 )
 
 const testAccVmInstanceResource = `
 resource "oneprovider_vm_instance" "ubuntu" {
 	location_id      = "34"
 	instance_size_id = "45"
-	template_id      = "1108"
+	template_id      = "100030"
 	hostname         = "ubuntu-test"
 }
 `
@@ -21,7 +22,7 @@ const testAccVmInstanceResourceUpdate = `
 resource "oneprovider_vm_instance" "ubuntu" {
 	location_id      = "34"
 	instance_size_id = "45"
-	template_id      = "1108"
+	template_id      = "100030"
 	hostname         = "ubuntu-test-updated"
 }
 `
@@ -63,7 +64,7 @@ func TestAccVmInstanceResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("template_id"),
-						knownvalue.StringExact("1108"),
+						knownvalue.StringExact("100030"),
 					),
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
@@ -108,7 +109,7 @@ func TestAccVmInstanceResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("template_id"),
-						knownvalue.StringExact("1108"),
+						knownvalue.StringExact("100030"),
 					),
 				},
 			},

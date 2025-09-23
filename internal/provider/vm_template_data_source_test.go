@@ -1,15 +1,16 @@
 package provider
 
 import (
+	"regexp"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
-	"regexp"
-	"testing"
 )
 
-const testAccVMTemplateDataSourceConfig = `data "oneprovider_vm_template" "ubuntu" { name = "Ubuntu 24.04 64bits" }`
+const testAccVMTemplateDataSourceConfig = `data "oneprovider_vm_template" "ubuntu" { name = "Ubuntu 24.04" }`
 
 const testAccVMTemplateDontExistDataSourceConfig = `data "oneprovider_vm_template" "ubuntu" { name = "random-name-that-does-not-exist" }`
 
@@ -24,12 +25,12 @@ func TestAccVMTemplateDataSource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_template.ubuntu",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("Ubuntu 24.04 64bits"),
+						knownvalue.StringExact("Ubuntu 24.04"),
 					),
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_template.ubuntu",
 						tfjsonpath.New("id"),
-						knownvalue.StringExact("1108"),
+						knownvalue.StringExact("100030"),
 					),
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_template.ubuntu",
