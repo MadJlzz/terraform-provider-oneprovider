@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-const testAccVMTemplateDataSourceConfig = `data "oneprovider_vm_template" "ubuntu" { name = "Ubuntu 24.04" }`
+const testAccVMTemplateDataSourceConfig = `data "oneprovider_vm_template" "ubuntu" { name = "Ubuntu 24.04.3 64bits" }`
 
 const testAccVMTemplateDontExistDataSourceConfig = `data "oneprovider_vm_template" "ubuntu" { name = "random-name-that-does-not-exist" }`
 
@@ -25,12 +25,12 @@ func TestAccVMTemplateDataSource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_template.ubuntu",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("Ubuntu 24.04"),
+						knownvalue.StringExact("Ubuntu 24.04.3 64bits"),
 					),
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_template.ubuntu",
 						tfjsonpath.New("id"),
-						knownvalue.StringExact("100030"),
+						knownvalue.StringExact("1194"),
 					),
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_template.ubuntu",

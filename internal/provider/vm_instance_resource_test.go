@@ -13,7 +13,7 @@ const testAccVmInstanceResource = `
 resource "oneprovider_vm_instance" "ubuntu" {
 	location_id      = "34"
 	instance_size_id = "45"
-	template_id      = "100030"
+	template_id      = "1194"
 	hostname         = "ubuntu-test"
 }
 `
@@ -22,7 +22,7 @@ const testAccVmInstanceResourceUpdate = `
 resource "oneprovider_vm_instance" "ubuntu" {
 	location_id      = "34"
 	instance_size_id = "45"
-	template_id      = "100030"
+	template_id      = "1194"
 	hostname         = "ubuntu-test-updated"
 }
 `
@@ -64,7 +64,7 @@ func TestAccVmInstanceResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("template_id"),
-						knownvalue.StringExact("100030"),
+						knownvalue.StringExact("1194"),
 					),
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
@@ -109,7 +109,7 @@ func TestAccVmInstanceResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("template_id"),
-						knownvalue.StringExact("100030"),
+						knownvalue.StringExact("1194"),
 					),
 				},
 			},
