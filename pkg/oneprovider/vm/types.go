@@ -110,3 +110,16 @@ func (v *InstanceDestroyRequest) UrlValues() url.Values {
 		"confirm_close": {strconv.FormatBool(v.ConfirmClose)},
 	}
 }
+
+type SizesListResponse struct {
+	Response map[string][]SizeReadResponse `json:"response"`
+}
+
+type SizeReadResponse struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+	Cores string `json:"cores"`
+	RAM   string `json:"ram"`
+	Disk  string `json:"disk"`
+}

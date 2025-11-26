@@ -143,6 +143,7 @@ func (p *OneProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		NewVmTemplateDataSource,
 		NewVMLocationDataSource,
 		NewSSHKeyDataSource,
+		NewVmSizeDataSource,
 	}
 }
 
