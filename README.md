@@ -13,7 +13,7 @@ Terraform provider for OneProvider. Provider documentation is available [here](h
 ### Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.12
-- [Go](https://golang.org/doc/install) >= 1.23.7
+- [Go](https://golang.org/doc/install) >= 1.24
 
 ### Developing the provider
 

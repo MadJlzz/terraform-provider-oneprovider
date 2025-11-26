@@ -87,3 +87,21 @@ func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyReque
 	}
 	return nil
 }
+
+func (s *Service) GetSizeByName(ctx context.Context, name string) (*SizeReadResponse, error) {
+	var response SizesListResponse
+	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/sizes", nil, &response)
+	if err != nil {
+		return nil, fmt.Errorf("vm: get location by city name failed: %w", err)
+	}
+
+	findSizeFn := func(s SizeReadResponse) bool { return s.Name == name }
+
+	for _, sizes := range response.Response {
+		size, found := common.FindElement(sizes, findSizeFn)
+		if found {
+			return &size, nil
+		}
+	}
+	return nil, fmt.Errorf("vm: size not found for name %s", name)
+}
