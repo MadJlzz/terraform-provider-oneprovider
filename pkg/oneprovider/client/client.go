@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 )
 
 type Client struct {
