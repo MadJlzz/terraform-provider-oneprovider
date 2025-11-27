@@ -96,12 +96,10 @@ func (s *Service) GetSizeByName(ctx context.Context, name string) (*SizeReadResp
 	}
 
 	findSizeFn := func(s SizeReadResponse) bool { return s.Name == name }
-
-	for _, sizes := range response.Response {
-		size, found := common.FindElement(sizes, findSizeFn)
-		if found {
-			return &size, nil
-		}
+	size, found := common.FindElement(response.Response, findSizeFn)
+	if found {
+		return &size, nil
 	}
+
 	return nil, fmt.Errorf("vm: size not found for name %s", name)
 }

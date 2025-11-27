@@ -112,7 +112,7 @@ func (v *InstanceDestroyRequest) UrlValues() url.Values {
 }
 
 type SizesListResponse struct {
-	Response map[string][]SizeReadResponse `json:"response"`
+	Response []SizeReadResponse `json:"response"`
 }
 
 type SizeReadResponse struct {
@@ -121,5 +121,5 @@ type SizeReadResponse struct {
 	Type  string `json:"type"`
 	Cores string `json:"cores"`
 	RAM   string `json:"ram"`
-	Disk  string `json:"disk"`
+	Disk  string `json:"hdd"`
 }
