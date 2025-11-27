@@ -105,6 +105,6 @@ func (ds *vmSizeDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	data.Cores = types.StringValue(s.Cores)
 	data.RAM = types.StringValue(s.RAM)
 	data.Disk = types.StringValue(s.Disk)
-	
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
