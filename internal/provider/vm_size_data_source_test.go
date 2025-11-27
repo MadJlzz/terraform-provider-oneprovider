@@ -11,7 +11,7 @@ import (
 )
 
 const testAccVmSizeDataSourceThatExistsConfig = `
-data "oneprovider_vm_size" "small" {name = "01d20c1"}
+data "oneprovider_vm_size" "small" {name = "01d20c1-2"}
 `
 const testAccVmSizeDataSourceThatDontExistsConfig = `
 data "oneprovider_vm_size" "unknown" {name = "aRandomSize"}
@@ -29,20 +29,39 @@ func TestAccVmSizeDataSource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_size.small",
 						tfjsonpath.New("id"),
-						knownvalue.StringExact("44"),
+						knownvalue.StringExact("71"),
 					),
-
 					statecheck.ExpectKnownValue(
 						"data.oneprovider_vm_size.small",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("01d20c1"),
+						knownvalue.StringExact("01d20c1-2"),
+					),
+					statecheck.ExpectKnownValue(
+						"data.oneprovider_vm_size.small",
+						tfjsonpath.New("type"),
+						knownvalue.StringExact("General Purpose"),
+					),
+					statecheck.ExpectKnownValue(
+						"data.oneprovider_vm_size.small",
+						tfjsonpath.New("cores"),
+						knownvalue.StringExact("1"),
+					),
+					statecheck.ExpectKnownValue(
+						"data.oneprovider_vm_size.small",
+						tfjsonpath.New("ram"),
+						knownvalue.StringExact("768"),
+					),
+					statecheck.ExpectKnownValue(
+						"data.oneprovider_vm_size.small",
+						tfjsonpath.New("disk"),
+						knownvalue.StringExact("20"),
 					),
 				},
 			},
 			// Read testing with a location that does not exist.
 			{
 				Config:      testAccVmSizeDataSourceThatDontExistsConfig,
-				ExpectError: regexp.MustCompile("location not found for city fez"),
+				ExpectError: regexp.MustCompile("size not found for name aRandomSize"),
 			},
 		},
 	})
