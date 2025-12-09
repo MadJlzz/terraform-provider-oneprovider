@@ -8,8 +8,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 )
 
 type Client struct {
@@ -86,12 +84,7 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 
 	// If there is an error, we stop and return it.
 	if errorCheck.Error != nil {
-		switch errorCheck.Error.Code {
-		case 42:
-			return common.ErrVmNotFound
-		default:
-			return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
-		}
+		return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
 	}
 
 	if result != nil {
