@@ -1,0 +1,1 @@
+terraform import oneprovider_vm_instance.vm "id"
