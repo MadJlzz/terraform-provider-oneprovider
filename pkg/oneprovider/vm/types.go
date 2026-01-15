@@ -46,6 +46,8 @@ type InstanceReadResponse struct {
 			IpAddress string `json:"ipaddress"`
 			Hostname  string `json:"hostname"`
 			City      string `json:"city"`
+			Plan      string `json:"plan"`
+			Template  string `json:"template"`
 		} `json:"server_info"`
 		ServerState struct {
 			Status string `json:"status"`
