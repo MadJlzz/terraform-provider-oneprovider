@@ -9,6 +9,7 @@ import (
 
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
@@ -19,7 +20,9 @@ import (
 )
 
 var (
-	_ resource.ResourceWithConfigure = &vmInstanceResource{}
+	_ resource.Resource                = &vmInstanceResource{}
+	_ resource.ResourceWithConfigure   = &vmInstanceResource{}
+	_ resource.ResourceWithImportState = &vmInstanceResource{}
 )
 
 type vmInstanceResource struct {
@@ -201,7 +204,48 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	// TODO: It seems we need to do other calls to replace the names by their ID... (e.g city)
+	// During import, only the ID is set. We need to populate required attributes
+	// by looking them up from the API response.
+	if data.LocationId.IsNull() {
+		lr, lErr := r.svc.VM.GetLocationByCity(ctx, info.Response.ServerInfo.City)
+		if lErr != nil {
+			resp.Diagnostics.AddError(
+				"Unable to refresh resource",
+				"An unexpected error occurred while attempting to refresh the resource during an Import."+
+					"Please retry the operation or report this issue to the provider developers.\n\n"+
+					lErr.Error(),
+			)
+			return
+		}
+		data.LocationId = types.StringValue(lr.Id)
+	}
+	if data.InstanceSizeId.IsNull() {
+		is, isErr := r.svc.VM.GetSizeByName(ctx, info.Response.ServerInfo.Plan)
+		if isErr != nil {
+			resp.Diagnostics.AddError(
+				"Unable to refresh resource",
+				"An unexpected error occurred while attempting to refresh the resource during an Import."+
+					"Please retry the operation or report this issue to the provider developers.\n\n"+
+					isErr.Error(),
+			)
+			return
+		}
+		data.InstanceSizeId = types.StringValue(is.Id)
+	}
+	if data.TemplateId.IsNull() {
+		ti, tiErr := r.svc.VM.GetTemplateByName(ctx, info.Response.ServerInfo.Template)
+		if tiErr != nil {
+			resp.Diagnostics.AddError(
+				"Unable to refresh resource",
+				"An unexpected error occurred while attempting to refresh the resource during an Import."+
+					"Please retry the operation or report this issue to the provider developers.\n\n"+
+					tiErr.Error(),
+			)
+			return
+		}
+		data.TemplateId = types.StringValue(strconv.Itoa(ti.Id))
+	}
+
 	data.Hostname = types.StringValue(info.Response.ServerInfo.Hostname)
 	data.IPAddress = types.StringValue(info.Response.ServerInfo.IpAddress)
 
@@ -281,4 +325,8 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 		)
 		return
 	}
+}
+
+func (r *vmInstanceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

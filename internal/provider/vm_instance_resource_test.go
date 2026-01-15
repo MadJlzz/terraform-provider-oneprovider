@@ -113,6 +113,7 @@ func TestAccVmInstanceResource(t *testing.T) {
 					),
 				},
 			},
+
 			// Delete testing automatically occurs in TestCase
 		},
 	})
