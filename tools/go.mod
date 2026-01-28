@@ -3,7 +3,7 @@ module tools
 go 1.24.0
 
 require (
-	github.com/hashicorp/copywrite v0.22.0
+	github.com/hashicorp/copywrite v0.23.0
 	github.com/hashicorp/terraform-plugin-docs v0.24.0
 )
 
@@ -22,7 +22,7 @@ require (
 	github.com/bgentry/speakeasy v0.2.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.9.1 // indirect
 	github.com/bradleyfalzon/ghinstallation/v2 v2.16.0 // indirect
-	github.com/cli/go-gh/v2 v2.12.1 // indirect
+	github.com/cli/go-gh/v2 v2.12.2 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
@@ -69,22 +69,22 @@ require (
 	github.com/samber/lo v1.51.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
-	github.com/spf13/cobra v1.9.1 // indirect
-	github.com/spf13/pflag v1.0.7 // indirect
+	github.com/spf13/cobra v1.10.1 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/thanhpk/randstr v1.0.6 // indirect
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-meta v1.1.0 // indirect
 	github.com/zclconf/go-cty v1.17.0 // indirect
 	go.abhg.dev/goldmark/frontmatter v0.2.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.4 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
-	golang.org/x/mod v0.28.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
-	golang.org/x/term v0.33.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
