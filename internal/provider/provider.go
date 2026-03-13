@@ -89,14 +89,6 @@ func (p *OneProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		clientKey = providerConfiguration.ClientKey.ValueString()
 	}
 
-	if endpoint == "" {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("endpoint"),
-			"Missing OneProvider API endpoint",
-			"Missing or empty value for endpoint property. Cannot create OneProvider API client. Set the endpoint value in the configuration.",
-		)
-	}
-
 	if clientKey == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_key"),

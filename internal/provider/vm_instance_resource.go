@@ -128,8 +128,25 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	locationId, _ := strconv.Atoi(data.LocationId.ValueString())
-	instanceSizeId, _ := strconv.Atoi(data.InstanceSizeId.ValueString())
+	locationId, err := strconv.Atoi(data.LocationId.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("location_id"),
+			"Invalid location_id",
+			"location_id must be a numeric string: "+err.Error(),
+		)
+		return
+	}
+
+	instanceSizeId, err := strconv.Atoi(data.InstanceSizeId.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("instance_size_id"),
+			"Invalid instance_size_id",
+			"instance_size_id must be a numeric string: "+err.Error(),
+		)
+		return
+	}
 
 	var sshKeys []string
 	resp.Diagnostics.Append(data.SshKeys.ElementsAs(ctx, &sshKeys, false)...)
@@ -155,7 +172,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	err = retry.RetryContext(ctx, time.Duration(2)*time.Minute, func() *retry.RetryError {
+	err = retry.RetryContext(ctx, 2*time.Minute, func() *retry.RetryError {
 		info, infoErr := r.svc.VM.GetInstanceByID(ctx, vmInstance.Response.Id)
 		if infoErr != nil {
 			return retry.NonRetryableError(infoErr)
@@ -192,6 +209,9 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data *vmInstanceResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	info, err := r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
 	if err != nil {
@@ -277,7 +297,7 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 			return
 		}
 
-		err = retry.RetryContext(ctx, time.Duration(30)*time.Second, func() *retry.RetryError {
+		err = retry.RetryContext(ctx, 30*time.Second, func() *retry.RetryError {
 			info, infoErr := r.svc.VM.GetInstanceByID(ctx, plan.ID.ValueString())
 			if infoErr != nil {
 				return retry.NonRetryableError(infoErr)

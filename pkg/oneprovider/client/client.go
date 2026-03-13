@@ -8,12 +8,14 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type Client struct {
-	apiKey    string
-	clientKey string
-	endpoint  string
+	apiKey     string
+	clientKey  string
+	endpoint   string
+	httpClient *http.Client
 }
 
 func NewClient(endpoint, apiKey, clientKey string) (*Client, error) {
@@ -32,9 +34,10 @@ func NewClient(endpoint, apiKey, clientKey string) (*Client, error) {
 	}
 
 	return &Client{
-		endpoint:  endpoint,
-		apiKey:    apiKey,
-		clientKey: clientKey,
+		endpoint:   endpoint,
+		apiKey:     apiKey,
+		clientKey:  clientKey,
+		httpClient: &http.Client{Timeout: 30 * time.Second},
 	}, nil
 }
 
@@ -49,7 +52,7 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 	req.Header.Add("Api-Key", c.apiKey)
 	req.Header.Add("Client-Key", c.clientKey)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
