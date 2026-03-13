@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,6 +11,9 @@ import (
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 )
+
+// ErrNotFound is returned by Get* methods when the requested resource does not exist.
+var ErrNotFound = errors.New("ssh: not found")
 
 type Service struct {
 	client *client.Client
@@ -32,7 +36,7 @@ func (s *Service) GetByID(ctx context.Context, id string) (*SshKeyReadResponse, 
 	})
 
 	if !found {
-		return nil, fmt.Errorf("ssh: key not found for id %s", id)
+		return nil, fmt.Errorf("ssh: key not found for id %s: %w", id, ErrNotFound)
 	}
 
 	return &key, nil

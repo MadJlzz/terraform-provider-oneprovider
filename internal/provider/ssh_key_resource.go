@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"time"
@@ -114,6 +115,10 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 	info, err := r.svc.SSH.GetByID(ctx, data.Id.ValueString())
 	if err != nil {
+		if errors.Is(err, ssh.ErrNotFound) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError(
 			"Unable to refresh resource",
 			"An unexpected error occurred while attempting to refresh the resource."+
