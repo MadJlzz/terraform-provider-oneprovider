@@ -73,7 +73,7 @@ func (s *Service) CreateInstance(ctx context.Context, req *InstanceCreateRequest
 }
 
 func (s *Service) UpdateInstanceHostname(ctx context.Context, req *InstanceHostnameUpdateRequest) error {
-	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.HostnameUrlValues().Encode()), nil)
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/hostname", strings.NewReader(req.UrlValues().Encode()), nil)
 	if err != nil {
 		return fmt.Errorf("vm: update instance hostname failed: %w", err)
 	}
@@ -92,7 +92,7 @@ func (s *Service) GetSizeByName(ctx context.Context, name string) (*SizeReadResp
 	var response SizesListResponse
 	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/sizes", nil, &response)
 	if err != nil {
-		return nil, fmt.Errorf("vm: get location by city name failed: %w", err)
+		return nil, fmt.Errorf("vm: get size by name failed: %w", err)
 	}
 
 	findSizeFn := func(s SizeReadResponse) bool { return s.Name == name }

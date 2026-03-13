@@ -19,7 +19,7 @@ type TemplateReadResponse struct {
 		Display     string `json:"display"`
 		Description string `json:"description"`
 		Oca         int    `json:"oca"`
-	}
+	} `json:"display"`
 }
 
 type LocationsListResponse struct {
@@ -72,9 +72,7 @@ func (v *InstanceCreateRequest) UrlValues() url.Values {
 		"hostname":      {v.Hostname},
 	}
 	for idx, key := range v.SshKeys {
-		//urlValues.Add(fmt.Sprintf("keys[%d]", idx), key)
 		urlValues.Add(fmt.Sprintf("ssh_keys[%d]", idx), key)
-		//urlValues.Add("ssh_keys", fmt.Sprintf("[%s]", key))
 	}
 	return urlValues
 }
@@ -94,7 +92,7 @@ type InstanceHostnameUpdateRequest struct {
 	Hostname string `json:"hostname"`
 }
 
-func (v *InstanceHostnameUpdateRequest) HostnameUrlValues() url.Values {
+func (v *InstanceHostnameUpdateRequest) UrlValues() url.Values {
 	return url.Values{
 		"vm_id":    {v.VmId},
 		"hostname": {v.Hostname},

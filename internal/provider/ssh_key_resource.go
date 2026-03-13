@@ -18,6 +18,7 @@ import (
 )
 
 var (
+	_ resource.Resource              = &sshKeyResource{}
 	_ resource.ResourceWithConfigure = &sshKeyResource{}
 )
 
@@ -154,7 +155,7 @@ func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 
 	// OneProvider backend needs time to apply changes, so we retry with backoff.
-	err = retry.RetryContext(ctx, time.Duration(30)*time.Second, func() *retry.RetryError {
+	err = retry.RetryContext(ctx, 30*time.Second, func() *retry.RetryError {
 		info, infoErr := r.svc.SSH.GetByID(ctx, data.Id.ValueString())
 		if infoErr != nil {
 			return retry.NonRetryableError(infoErr)
