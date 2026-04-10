@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+// APIError represents an error returned by the OneProvider API in the response body.
+type APIError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+func (e *APIError) Error() string {
+	return fmt.Sprintf("api error %d: %s", e.Code, e.Message)
+}
+
 type Client struct {
 	apiKey     string
 	clientKey  string
@@ -73,10 +83,7 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 
 	// Check for API errors in the response body
 	var errorCheck struct {
-		Error *struct {
-			Code    int    `json:"code"`
-			Message string `json:"message"`
-		} `json:"error"`
+		Error *APIError `json:"error"`
 	}
 
 	// Try to decode the error structure.
@@ -87,7 +94,7 @@ func (c *Client) MakeAPICall(ctx context.Context, method, endpoint string, body 
 
 	// If there is an error, we stop and return it.
 	if errorCheck.Error != nil {
-		return fmt.Errorf("client: api internal error %d: %s", errorCheck.Error.Code, errorCheck.Error.Message)
+		return errorCheck.Error
 	}
 
 	if result != nil {
