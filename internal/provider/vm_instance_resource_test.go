@@ -1,8 +1,15 @@
 package provider
 
 import (
+	"context"
+	"errors"
+	"os"
 	"testing"
+	"time"
 
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
@@ -26,6 +33,63 @@ resource "oneprovider_vm_instance" "ubuntu" {
 	hostname         = "ubuntu-test-updated"
 }
 `
+
+func TestAccVmInstanceResource_removedOutOfBand(t *testing.T) {
+	var vmID string
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccVmInstanceResource,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrWith("oneprovider_vm_instance.ubuntu", "id", func(value string) error {
+						vmID = value
+						return nil
+					}),
+				),
+			},
+			{
+				PreConfig: func() {
+					svc, err := oneprovider.NewService(
+						DefaultEndpoint,
+						os.Getenv(ApiKeyEnvVar),
+						os.Getenv(ClientKeyEnvVar),
+					)
+					if err != nil {
+						t.Fatalf("failed to create service for out-of-band deletion: %v", err)
+					}
+					err = svc.VM.DestroyInstance(context.Background(), &vm.InstanceDestroyRequest{
+						VmId:         vmID,
+						ConfirmClose: true,
+					})
+					if err != nil {
+						t.Fatalf("failed to destroy VM out-of-band: %v", err)
+					}
+
+					// Poll until the API confirms the VM is gone (error 810).
+					deadline := time.Now().Add(2 * time.Minute)
+					for time.Now().Before(deadline) {
+						_, err = svc.VM.GetInstanceByID(context.Background(), vmID)
+						if err != nil {
+							var apiErr *client.APIError
+							if errors.As(err, &apiErr) && apiErr.Code == 810 {
+								break
+							}
+						}
+						time.Sleep(5 * time.Second)
+					}
+					if err == nil {
+						t.Fatalf("VM %s still exists after waiting for deletion", vmID)
+					}
+				},
+				RefreshState:       true,
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
 
 func TestAccVmInstanceResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
