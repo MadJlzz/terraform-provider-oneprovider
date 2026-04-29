@@ -10,6 +10,7 @@ import (
 
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -32,14 +33,15 @@ type vmInstanceResource struct {
 }
 
 type vmInstanceResourceModel struct {
-	ID             types.String `tfsdk:"id"`
-	LocationId     types.String `tfsdk:"location_id"`
-	InstanceSizeId types.String `tfsdk:"instance_size_id"`
-	TemplateId     types.String `tfsdk:"template_id"`
-	Hostname       types.String `tfsdk:"hostname"`
-	IPAddress      types.String `tfsdk:"ip_address"`
-	Password       types.String `tfsdk:"password"`
-	SshKeys        types.List   `tfsdk:"ssh_keys"`
+	ID             types.String   `tfsdk:"id"`
+	LocationId     types.String   `tfsdk:"location_id"`
+	InstanceSizeId types.String   `tfsdk:"instance_size_id"`
+	TemplateId     types.String   `tfsdk:"template_id"`
+	Hostname       types.String   `tfsdk:"hostname"`
+	IPAddress      types.String   `tfsdk:"ip_address"`
+	Password       types.String   `tfsdk:"password"`
+	SshKeys        types.List     `tfsdk:"ssh_keys"`
+	Timeouts       timeouts.Value `tfsdk:"timeouts"`
 }
 
 func NewVmInstanceResource() resource.Resource {
@@ -118,6 +120,12 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 		},
+		Blocks: map[string]schema.Block{
+			"timeouts": timeouts.Block(ctx, timeouts.Opts{
+				Create: true,
+				Update: true,
+			}),
+		},
 	}
 }
 
@@ -174,7 +182,13 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	err = retry.RetryContext(ctx, 2*time.Minute, func() *retry.RetryError {
+	createTimeout, diags := data.Timeouts.Create(ctx, 5*time.Minute)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	err = retry.RetryContext(ctx, createTimeout, func() *retry.RetryError {
 		info, infoErr := r.svc.VM.GetInstanceByID(ctx, vmInstance.Response.Id)
 		if infoErr != nil {
 			return retry.NonRetryableError(infoErr)
@@ -304,7 +318,13 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 			return
 		}
 
-		err = retry.RetryContext(ctx, 30*time.Second, func() *retry.RetryError {
+		updateTimeout, diags := plan.Timeouts.Update(ctx, 30*time.Second)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		err = retry.RetryContext(ctx, updateTimeout, func() *retry.RetryError {
 			info, infoErr := r.svc.VM.GetInstanceByID(ctx, plan.ID.ValueString())
 			if infoErr != nil {
 				return retry.NonRetryableError(infoErr)
