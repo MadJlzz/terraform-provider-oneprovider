@@ -112,7 +112,7 @@ func (ds *vmLocationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	data.ID = types.StringValue(l.Id)
+	data.ID = types.StringValue(l.Id.String())
 	data.Region = types.StringValue(l.Region)
 	data.Country = types.StringValue(l.Country)
 	data.AvailableTypes, _ = types.ListValueFrom(ctx, types.StringType, l.AvailableTypes)

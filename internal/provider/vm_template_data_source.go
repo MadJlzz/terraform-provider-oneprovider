@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -84,7 +83,7 @@ func (ds *vmTemplateDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	data.ID = types.StringValue(strconv.Itoa(tpl.Id))
+	data.ID = types.StringValue(tpl.Id.String())
 	data.Size = types.StringValue(tpl.Size)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

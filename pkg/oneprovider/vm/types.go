@@ -1,17 +1,116 @@
 package vm
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"strconv"
 )
+
+type NumericString string
+
+func (v NumericString) String() string {
+	return string(v)
+}
+
+func (v *NumericString) UnmarshalJSON(data []byte) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+
+	var value any
+	if err := decoder.Decode(&value); err != nil {
+		return fmt.Errorf("invalid numeric string JSON: %w", err)
+	}
+
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		if err == nil {
+			return fmt.Errorf("invalid numeric string JSON: trailing data")
+		}
+		return fmt.Errorf("invalid numeric string JSON: trailing data: %w", err)
+	}
+
+	switch value := value.(type) {
+	case string:
+		if !isNonNegativeDecimalInteger(value) {
+			return fmt.Errorf("invalid numeric string %q", value)
+		}
+		*v = NumericString(value)
+		return nil
+	case json.Number:
+		valueString := value.String()
+		if !isNonNegativeDecimalInteger(valueString) {
+			return fmt.Errorf("invalid numeric string number %q", valueString)
+		}
+		*v = NumericString(valueString)
+		return nil
+	default:
+		return fmt.Errorf("invalid numeric string JSON type %T", value)
+	}
+}
+
+type APIID string
+
+func (v APIID) String() string {
+	return string(v)
+}
+
+func (v *APIID) UnmarshalJSON(data []byte) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+
+	var value any
+	if err := decoder.Decode(&value); err != nil {
+		return fmt.Errorf("invalid API ID JSON: %w", err)
+	}
+
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		if err == nil {
+			return fmt.Errorf("invalid API ID JSON: trailing data")
+		}
+		return fmt.Errorf("invalid API ID JSON: trailing data: %w", err)
+	}
+
+	switch value := value.(type) {
+	case string:
+		if value == "" {
+			return fmt.Errorf("invalid API ID: empty string")
+		}
+		*v = APIID(value)
+		return nil
+	case json.Number:
+		valueString := value.String()
+		if !isNonNegativeDecimalInteger(valueString) {
+			return fmt.Errorf("invalid API ID number %q", valueString)
+		}
+		*v = APIID(valueString)
+		return nil
+	default:
+		return fmt.Errorf("invalid API ID JSON type %T", value)
+	}
+}
+
+func isNonNegativeDecimalInteger(value string) bool {
+	if value == "" {
+		return false
+	}
+	for _, digit := range value {
+		if digit < '0' || digit > '9' {
+			return false
+		}
+	}
+	return true
+}
 
 type TemplatesListResponse struct {
 	Templates []TemplateReadResponse `json:"response"`
 }
 
 type TemplateReadResponse struct {
-	Id      int    `json:"id"`
+	Id      APIID  `json:"id"`
 	Name    string `json:"name"`
 	Size    string `json:"size"`
 	Display struct {
@@ -27,7 +126,7 @@ type LocationsListResponse struct {
 }
 
 type LocationReadResponse struct {
-	Id             string   `json:"id"`
+	Id             APIID    `json:"id"`
 	Region         string   `json:"region"`
 	Country        string   `json:"country"`
 	City           string   `json:"city"`
@@ -80,7 +179,7 @@ func (v *InstanceCreateRequest) UrlValues() url.Values {
 type InstanceCreateResponse struct {
 	Response struct {
 		Message   string `json:"message"`
-		Id        string `json:"id"`
+		Id        APIID  `json:"id"`
 		IpAddress string `json:"ip_address"`
 		Hostname  string `json:"hostname"`
 		Password  string `json:"password"`
@@ -116,10 +215,10 @@ type SizesListResponse struct {
 }
 
 type SizeReadResponse struct {
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Type  string `json:"type"`
-	Cores string `json:"cores"`
-	RAM   string `json:"ram"`
-	Disk  string `json:"hdd"`
+	Id    APIID         `json:"id"`
+	Name  string        `json:"name"`
+	Type  string        `json:"type"`
+	Cores NumericString `json:"cores"`
+	RAM   NumericString `json:"ram"`
+	Disk  NumericString `json:"hdd"`
 }
