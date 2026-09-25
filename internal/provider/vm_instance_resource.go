@@ -189,7 +189,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	err = retry.RetryContext(ctx, createTimeout, func() *retry.RetryError {
-		info, infoErr := r.svc.VM.GetInstanceByID(ctx, vmInstance.Response.Id)
+		info, infoErr := r.svc.VM.GetInstanceByID(ctx, vmInstance.Response.Id.String())
 		if infoErr != nil {
 			return retry.NonRetryableError(infoErr)
 		}
@@ -215,7 +215,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Set the value for computed attributes.
-	data.ID = types.StringValue(vmInstance.Response.Id)
+	data.ID = types.StringValue(vmInstance.Response.Id.String())
 	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
 	data.Password = types.StringValue(vmInstance.Response.Password)
 
@@ -258,7 +258,7 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 			)
 			return
 		}
-		data.LocationId = types.StringValue(lr.Id)
+		data.LocationId = types.StringValue(lr.Id.String())
 	}
 	if data.InstanceSizeId.IsNull() {
 		is, isErr := r.svc.VM.GetSizeByName(ctx, info.Response.ServerInfo.Plan)
@@ -271,7 +271,7 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 			)
 			return
 		}
-		data.InstanceSizeId = types.StringValue(is.Id)
+		data.InstanceSizeId = types.StringValue(is.Id.String())
 	}
 	if data.TemplateId.IsNull() {
 		ti, tiErr := r.svc.VM.GetTemplateByName(ctx, info.Response.ServerInfo.Template)
@@ -284,7 +284,7 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 			)
 			return
 		}
-		data.TemplateId = types.StringValue(strconv.Itoa(ti.Id))
+		data.TemplateId = types.StringValue(ti.Id.String())
 	}
 
 	data.Hostname = types.StringValue(info.Response.ServerInfo.Hostname)
