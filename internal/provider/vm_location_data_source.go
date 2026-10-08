@@ -2,9 +2,14 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"math/big"
 
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -84,6 +89,55 @@ func (ds *vmLocationDataSource) Schema(ctx context.Context, req datasource.Schem
 	}
 }
 
+func availableSizesToTerraform(_ context.Context, sizes []vm.StringOrNumber) (types.List, diag.Diagnostics) {
+	if sizes == nil {
+		return types.ListNull(types.NumberType), nil
+	}
+
+	elements := make([]attr.Value, len(sizes))
+	var diags diag.Diagnostics
+	for index, size := range sizes {
+		value := size.String()
+		if value == "" {
+			diags.AddAttributeError(
+				path.Root("available_sizes").AtListIndex(index),
+				"Invalid available size ID",
+				"available_sizes elements must be non-empty decimal integer IDs.",
+			)
+			continue
+		}
+		validDigits := true
+		for _, digit := range value {
+			if digit < '0' || digit > '9' {
+				validDigits = false
+				break
+			}
+		}
+		if !validDigits {
+			diags.AddAttributeError(
+				path.Root("available_sizes").AtListIndex(index),
+				"Invalid available size ID",
+				fmt.Sprintf("available_sizes[%d] must be a non-negative decimal integer, got %q.", index, value),
+			)
+			continue
+		}
+		integer, ok := new(big.Int).SetString(value, 10)
+		if !ok {
+			diags.AddAttributeError(
+				path.Root("available_sizes").AtListIndex(index),
+				"Invalid available size ID",
+				fmt.Sprintf("available_sizes[%d] must be a non-negative decimal integer, got %q.", index, value),
+			)
+			continue
+		}
+		elements[index] = types.NumberValue(new(big.Float).SetPrec(uint(integer.BitLen() + 1)).SetInt(integer))
+	}
+	if diags.HasError() {
+		return types.ListNull(types.NumberType), diags
+	}
+	return types.ListValue(types.NumberType, elements)
+}
+
 func (ds *vmLocationDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *vmLocationDataSourceModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
@@ -112,11 +166,30 @@ func (ds *vmLocationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
+	if l.Id.String() == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("id"),
+			"Invalid location ID",
+			"The API returned an empty location ID; refusing to write an empty ID to state.",
+		)
+		return
+	}
+
 	data.ID = types.StringValue(l.Id.String())
 	data.Region = types.StringValue(l.Region)
 	data.Country = types.StringValue(l.Country)
-	data.AvailableTypes, _ = types.ListValueFrom(ctx, types.StringType, l.AvailableTypes)
-	data.AvailableSizes, _ = types.ListValueFrom(ctx, types.NumberType, l.AvailableSizes)
+	var availableTypesDiags diag.Diagnostics
+	data.AvailableTypes, availableTypesDiags = types.ListValueFrom(ctx, types.StringType, l.AvailableTypes)
+	resp.Diagnostics.Append(availableTypesDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	var availableSizesDiags diag.Diagnostics
+	data.AvailableSizes, availableSizesDiags = availableSizesToTerraform(ctx, l.AvailableSizes)
+	resp.Diagnostics.Append(availableSizesDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 	data.Ipv4 = types.StringValue(l.AvailableIPs.IPv4)
 	data.Ipv6 = types.StringValue(l.AvailableIPs.IPv6)
 
