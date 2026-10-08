@@ -90,12 +90,20 @@ func (ds *vmSizeDataSource) Read(ctx context.Context, req datasource.ReadRequest
 
 	s, err := ds.svc.VM.GetSizeByName(ctx, name)
 	if err != nil {
-		resp.Diagnostics.Append()
 		resp.Diagnostics.AddError(
 			"Unable to refresh datasource",
 			"An unexpected error occurred while creating the datasource read request."+
 				"Please report this issue to the provider developers.\n\n"+
 				err.Error(),
+		)
+		return
+	}
+
+	if s.Id.String() == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("id"),
+			"Invalid size ID",
+			"The API returned an empty size ID; refusing to write an empty ID to state.",
 		)
 		return
 	}

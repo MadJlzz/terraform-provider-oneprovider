@@ -4,53 +4,70 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/url"
 	"strconv"
 )
 
-type NumericString string
+// StringOrNumber preserves response values which OneProvider returns either as
+// JSON strings or JSON numbers. JSON null is represented by the empty string.
+// Business validation belongs at the use site, not at this wire seam.
+type StringOrNumber string
 
-func (v NumericString) String() string {
+func (v StringOrNumber) String() string {
 	return string(v)
 }
 
-func (v *NumericString) UnmarshalJSON(data []byte) error {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.UseNumber()
+func (v *StringOrNumber) UnmarshalJSON(data []byte) error {
+	if isJSONNull(data) {
+		return nil
+	}
+	value, err := decodeStringOrNumber(data)
+	if err != nil {
+		return fmt.Errorf("invalid string/number JSON: %w", err)
+	}
+	*v = StringOrNumber(value)
+	return nil
+}
 
-	var value any
-	if err := decoder.Decode(&value); err != nil {
-		return fmt.Errorf("invalid numeric string JSON: %w", err)
+// NumericString is kept as a source-compatible name for callers of earlier
+// provider versions. It has the same tolerant wire semantics as StringOrNumber.
+type NumericString = StringOrNumber
+
+var jsonNull = []byte("null")
+
+func isJSONNull(data []byte) bool {
+	return bytes.Equal(data, jsonNull)
+}
+
+// decodeStringOrNumber inspects the raw JSON value instead of decoding it into
+// an interface, so numbers keep their exact wire text. Callers handle null.
+func decodeStringOrNumber(data []byte) (string, error) {
+	if len(data) == 0 {
+		return "", fmt.Errorf("empty JSON value")
 	}
 
-	var trailing any
-	if err := decoder.Decode(&trailing); err != io.EOF {
-		if err == nil {
-			return fmt.Errorf("invalid numeric string JSON: trailing data")
+	switch c := data[0]; {
+	case c == '"':
+		var value string
+		if err := json.Unmarshal(data, &value); err != nil {
+			return "", err
 		}
-		return fmt.Errorf("invalid numeric string JSON: trailing data: %w", err)
-	}
-
-	switch value := value.(type) {
-	case string:
-		if !isNonNegativeDecimalInteger(value) {
-			return fmt.Errorf("invalid numeric string %q", value)
+		return value, nil
+	case c == '-' || ('0' <= c && c <= '9'):
+		// UnmarshalJSON may be called directly, so the number literal is
+		// validated here rather than relying on json.Unmarshal having done it.
+		if !json.Valid(data) {
+			return "", fmt.Errorf("invalid JSON number")
 		}
-		*v = NumericString(value)
-		return nil
-	case json.Number:
-		valueString := value.String()
-		if !isNonNegativeDecimalInteger(valueString) {
-			return fmt.Errorf("invalid numeric string number %q", valueString)
-		}
-		*v = NumericString(valueString)
-		return nil
+		return string(data), nil
 	default:
-		return fmt.Errorf("invalid numeric string JSON type %T", value)
+		return "", fmt.Errorf("unsupported JSON value starting with %q", c)
 	}
 }
 
+// APIID is opaque response text. OneProvider may encode it as a JSON string,
+// number, or null; whether an operation requires a numeric ID is validated by
+// that operation instead of this response decoder.
 type APIID string
 
 func (v APIID) String() string {
@@ -58,67 +75,61 @@ func (v APIID) String() string {
 }
 
 func (v *APIID) UnmarshalJSON(data []byte) error {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.UseNumber()
-
-	var value any
-	if err := decoder.Decode(&value); err != nil {
+	if isJSONNull(data) {
+		return nil
+	}
+	value, err := decodeStringOrNumber(data)
+	if err != nil {
 		return fmt.Errorf("invalid API ID JSON: %w", err)
 	}
-
-	var trailing any
-	if err := decoder.Decode(&trailing); err != io.EOF {
-		if err == nil {
-			return fmt.Errorf("invalid API ID JSON: trailing data")
-		}
-		return fmt.Errorf("invalid API ID JSON: trailing data: %w", err)
-	}
-
-	switch value := value.(type) {
-	case string:
-		if value == "" {
-			return fmt.Errorf("invalid API ID: empty string")
-		}
-		*v = APIID(value)
-		return nil
-	case json.Number:
-		valueString := value.String()
-		if !isNonNegativeDecimalInteger(valueString) {
-			return fmt.Errorf("invalid API ID number %q", valueString)
-		}
-		*v = APIID(valueString)
-		return nil
-	default:
-		return fmt.Errorf("invalid API ID JSON type %T", value)
-	}
+	*v = APIID(value)
+	return nil
 }
 
-func isNonNegativeDecimalInteger(value string) bool {
-	if value == "" {
-		return false
+// BoolOrString accepts the two representations used by /vm/info for
+// server_install: a JSON boolean and the documented JSON string "false".
+// JSON null leaves the value unchanged, matching a plain bool field.
+type BoolOrString bool
+
+func (v *BoolOrString) UnmarshalJSON(data []byte) error {
+	if isJSONNull(data) {
+		return nil
 	}
-	for _, digit := range value {
-		if digit < '0' || digit > '9' {
-			return false
+
+	value := string(data)
+	if len(data) > 0 && data[0] == '"' {
+		if err := json.Unmarshal(data, &value); err != nil {
+			return fmt.Errorf("invalid bool/string JSON: %w", err)
 		}
 	}
-	return true
+
+	switch value {
+	case "true":
+		*v = true
+	case "false":
+		*v = false
+	default:
+		return fmt.Errorf("invalid bool/string JSON value")
+	}
+	return nil
 }
 
 type TemplatesListResponse struct {
 	Templates []TemplateReadResponse `json:"response"`
 }
 
+type TemplateDisplayReadResponse struct {
+	Name        string         `json:"name"`
+	Display     string         `json:"display"`
+	Description string         `json:"description"`
+	Oca         StringOrNumber `json:"oca"`
+}
+
 type TemplateReadResponse struct {
-	Id      APIID  `json:"id"`
-	Name    string `json:"name"`
-	Size    string `json:"size"`
-	Display struct {
-		Name        string `json:"name"`
-		Display     string `json:"display"`
-		Description string `json:"description"`
-		Oca         int    `json:"oca"`
-	} `json:"display"`
+	Id      APIID                       `json:"id"`
+	Name    string                      `json:"name"`
+	Size    StringOrNumber              `json:"size"`
+	Display TemplateDisplayReadResponse `json:"display"`
 }
 
 type LocationsListResponse struct {
@@ -126,12 +137,12 @@ type LocationsListResponse struct {
 }
 
 type LocationReadResponse struct {
-	Id             APIID    `json:"id"`
-	Region         string   `json:"region"`
-	Country        string   `json:"country"`
-	City           string   `json:"city"`
-	AvailableTypes []string `json:"available_types"`
-	AvailableSizes []int    `json:"available_sizes"`
+	Id             APIID            `json:"id"`
+	Region         string           `json:"region"`
+	Country        string           `json:"country"`
+	City           string           `json:"city"`
+	AvailableTypes []string         `json:"available_types"`
+	AvailableSizes []StringOrNumber `json:"available_sizes"`
 	AvailableIPs   struct {
 		IPv4 string `json:"ipv4"`
 		IPv6 string `json:"ipv6"`
@@ -140,7 +151,7 @@ type LocationReadResponse struct {
 
 type InstanceReadResponse struct {
 	Response struct {
-		ServerInstall bool `json:"server_install"`
+		ServerInstall BoolOrString `json:"server_install"`
 		ServerInfo    struct {
 			IpAddress string `json:"ipaddress"`
 			Hostname  string `json:"hostname"`
@@ -215,10 +226,10 @@ type SizesListResponse struct {
 }
 
 type SizeReadResponse struct {
-	Id    APIID         `json:"id"`
-	Name  string        `json:"name"`
-	Type  string        `json:"type"`
-	Cores NumericString `json:"cores"`
-	RAM   NumericString `json:"ram"`
-	Disk  NumericString `json:"hdd"`
+	Id    APIID          `json:"id"`
+	Name  string         `json:"name"`
+	Type  string         `json:"type"`
+	Cores StringOrNumber `json:"cores"`
+	RAM   StringOrNumber `json:"ram"`
+	Disk  StringOrNumber `json:"hdd"`
 }

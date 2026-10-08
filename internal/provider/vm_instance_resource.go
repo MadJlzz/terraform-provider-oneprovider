@@ -44,6 +44,60 @@ type vmInstanceResourceModel struct {
 	Timeouts       timeouts.Value `tfsdk:"timeouts"`
 }
 
+func parseRequiredNumericID(value string) (int, error) {
+	if value == "" {
+		return 0, fmt.Errorf("ID must not be empty")
+	}
+	for _, digit := range value {
+		if digit < '0' || digit > '9' {
+			return 0, fmt.Errorf("ID must be a non-negative decimal integer")
+		}
+	}
+	parsed, err := strconv.ParseInt(value, 10, strconv.IntSize)
+	if err != nil {
+		return 0, fmt.Errorf("ID is out of range for int: %w", err)
+	}
+	return int(parsed), nil
+}
+
+func requiredResponseID(id vm.APIID) (string, error) {
+	value := id.String()
+	if value == "" {
+		return "", fmt.Errorf("response ID is empty")
+	}
+	return value, nil
+}
+
+func requiredCreateResponseID(id vm.APIID) (string, error) {
+	return requiredResponseID(id)
+}
+
+type instanceInfoGetter func(context.Context, string) (*vm.InstanceReadResponse, error)
+
+func waitForVMReady(ctx context.Context, timeout time.Duration, id vm.APIID, get instanceInfoGetter) error {
+	instanceID, err := requiredCreateResponseID(id)
+	if err != nil {
+		return err
+	}
+
+	return retry.RetryContext(ctx, timeout, func() *retry.RetryError {
+		info, infoErr := get(ctx, instanceID)
+		if infoErr != nil {
+			return retry.NonRetryableError(infoErr)
+		}
+		if info.Response.ServerInstall || strings.ToLower(info.Response.ServerState.State) == "offline" {
+			return retry.RetryableError(fmt.Errorf("vm instance not ready yet"))
+		}
+		if info.Response.ServerInfo.IpAddress == "" {
+			// This should never been happening because when I do the create - I get an IP back.
+			// The fact that from the GET endpoint, there is some cases where ServerInfo.* is filled with empty
+			// values means that something is wrong in their backend.
+			return retry.RetryableError(fmt.Errorf("getInstance returned empty informations"))
+		}
+		return nil
+	})
+}
+
 func NewVmInstanceResource() resource.Resource {
 	return &vmInstanceResource{}
 }
@@ -138,22 +192,31 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	locationId, err := strconv.Atoi(data.LocationId.ValueString())
+	locationId, err := parseRequiredNumericID(data.LocationId.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("location_id"),
 			"Invalid location_id",
-			"location_id must be a numeric string: "+err.Error(),
+			"location_id must be a non-negative decimal integer: "+err.Error(),
 		)
 		return
 	}
 
-	instanceSizeId, err := strconv.Atoi(data.InstanceSizeId.ValueString())
+	instanceSizeId, err := parseRequiredNumericID(data.InstanceSizeId.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("instance_size_id"),
 			"Invalid instance_size_id",
-			"instance_size_id must be a numeric string: "+err.Error(),
+			"instance_size_id must be a non-negative decimal integer: "+err.Error(),
+		)
+		return
+	}
+
+	if data.TemplateId.ValueString() == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("template_id"),
+			"Invalid template_id",
+			"template_id must not be empty.",
 		)
 		return
 	}
@@ -182,28 +245,27 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
+	responseID, err := requiredCreateResponseID(vmInstance.Response.Id)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to create resource",
+			fmt.Sprintf(
+				"The API accepted the create request but returned an empty VM ID, so Terraform cannot track the VM. "+
+					"A VM may still have been created (hostname %q, IP address %q); check the OneProvider panel "+
+					"and delete or import it manually.",
+				data.Hostname.ValueString(), vmInstance.Response.IpAddress,
+			),
+		)
+		return
+	}
+
 	createTimeout, diags := data.Timeouts.Create(ctx, 5*time.Minute)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	err = retry.RetryContext(ctx, createTimeout, func() *retry.RetryError {
-		info, infoErr := r.svc.VM.GetInstanceByID(ctx, vmInstance.Response.Id.String())
-		if infoErr != nil {
-			return retry.NonRetryableError(infoErr)
-		}
-		if info.Response.ServerInstall || strings.ToLower(info.Response.ServerState.State) == "offline" {
-			return retry.RetryableError(fmt.Errorf("vm instance not ready yet"))
-		}
-		if info.Response.ServerInfo.IpAddress == "" {
-			// This should never been happening because when I do the create - I get an IP back.
-			// The fact that from the GET endpoint, there is some cases where ServerInfo.* is filled with empty
-			// values means that something is wrong in their backend.
-			return retry.RetryableError(fmt.Errorf("getInstance returned empty informations"))
-		}
-		return nil
-	})
+	err = waitForVMReady(ctx, createTimeout, vmInstance.Response.Id, r.svc.VM.GetInstanceByID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to refresh resource",
@@ -215,7 +277,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Set the value for computed attributes.
-	data.ID = types.StringValue(vmInstance.Response.Id.String())
+	data.ID = types.StringValue(responseID)
 	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
 	data.Password = types.StringValue(vmInstance.Response.Password)
 
@@ -247,7 +309,7 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	// During import, only the ID is set. We need to populate required attributes
 	// by looking them up from the API response.
-	if data.LocationId.IsNull() {
+	if data.LocationId.IsNull() || data.LocationId.ValueString() == "" {
 		lr, lErr := r.svc.VM.GetLocationByCity(ctx, info.Response.ServerInfo.City)
 		if lErr != nil {
 			resp.Diagnostics.AddError(
@@ -258,9 +320,17 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 			)
 			return
 		}
+		if lr.Id.String() == "" {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("location_id"),
+				"Invalid location ID",
+				"The API returned an empty location ID during import; refusing to write an empty ID to state.",
+			)
+			return
+		}
 		data.LocationId = types.StringValue(lr.Id.String())
 	}
-	if data.InstanceSizeId.IsNull() {
+	if data.InstanceSizeId.IsNull() || data.InstanceSizeId.ValueString() == "" {
 		is, isErr := r.svc.VM.GetSizeByName(ctx, info.Response.ServerInfo.Plan)
 		if isErr != nil {
 			resp.Diagnostics.AddError(
@@ -271,9 +341,17 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 			)
 			return
 		}
+		if is.Id.String() == "" {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("instance_size_id"),
+				"Invalid size ID",
+				"The API returned an empty size ID during import; refusing to write an empty ID to state.",
+			)
+			return
+		}
 		data.InstanceSizeId = types.StringValue(is.Id.String())
 	}
-	if data.TemplateId.IsNull() {
+	if data.TemplateId.IsNull() || data.TemplateId.ValueString() == "" {
 		ti, tiErr := r.svc.VM.GetTemplateByName(ctx, info.Response.ServerInfo.Template)
 		if tiErr != nil {
 			resp.Diagnostics.AddError(
@@ -281,6 +359,14 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 				"An unexpected error occurred while attempting to refresh the resource during an Import."+
 					"Please retry the operation or report this issue to the provider developers.\n\n"+
 					tiErr.Error(),
+			)
+			return
+		}
+		if ti.Id.String() == "" {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("template_id"),
+				"Invalid template ID",
+				"The API returned an empty template ID during import; refusing to write an empty ID to state.",
 			)
 			return
 		}

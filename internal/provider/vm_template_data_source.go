@@ -83,8 +83,17 @@ func (ds *vmTemplateDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
+	if tpl.Id.String() == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("id"),
+			"Invalid template ID",
+			"The API returned an empty template ID; refusing to write an empty ID to state.",
+		)
+		return
+	}
+
 	data.ID = types.StringValue(tpl.Id.String())
-	data.Size = types.StringValue(tpl.Size)
+	data.Size = types.StringValue(tpl.Size.String())
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
