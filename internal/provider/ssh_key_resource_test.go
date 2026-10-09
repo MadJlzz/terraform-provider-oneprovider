@@ -9,36 +9,29 @@ import (
 	"testing"
 )
 
-const testAccSshKeyResource = `
+func testAccSshKeyResourceConfig(name, publicKey string) string {
+	return fmt.Sprintf(`
 resource "oneprovider_ssh_key" "key" {
-	name       = "frodoshouse"
-	public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMbAn3/YgZhhmsQIiGjOPOhODxpKXUo+LF3rFBvOOnYl"
+	name       = %q
+	public_key = %q
 }
-`
-
-const testAccSshKeyResourceNameUpdate = `
-resource "oneprovider_ssh_key" "key" {
-	name       = "frodosnewhouse"
-	public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMbAn3/YgZhhmsQIiGjOPOhODxpKXUo+LF3rFBvOOnYl"
+`, name, publicKey)
 }
-`
-
-const testAccSshKeyResourceKeyUpdate = `
-resource "oneprovider_ssh_key" "key" {
-	name       = "frodosnewhouse"
-	public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMbAn3/YgZhhmsQIiGjOPOhODxpKXUo+LF3rFBvOOnYw"
-}
-`
 
 func TestAccSshKeyResource(t *testing.T) {
 	var initialID string
+
+	name := testAccRandomName()
+	updatedName := testAccRandomName()
+	publicKey := testAccRandomSSHPublicKey(t)
+	updatedPublicKey := testAccRandomSSHPublicKey(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccSshKeyResource,
+				Config: testAccSshKeyResourceConfig(name, publicKey),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrWith("oneprovider_ssh_key.key", "id", func(value string) error {
 						initialID = value
@@ -54,27 +47,27 @@ func TestAccSshKeyResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_ssh_key.key",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("frodoshouse"),
+						knownvalue.StringExact(name),
 					),
 					statecheck.ExpectKnownValue(
 						"oneprovider_ssh_key.key",
 						tfjsonpath.New("public_key"),
-						knownvalue.StringExact("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMbAn3/YgZhhmsQIiGjOPOhODxpKXUo+LF3rFBvOOnYl"),
+						knownvalue.StringExact(publicKey),
 					),
 				},
 			},
 			{
-				Config: testAccSshKeyResourceNameUpdate,
+				Config: testAccSshKeyResourceConfig(updatedName, publicKey),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"oneprovider_ssh_key.key",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("frodosnewhouse"),
+						knownvalue.StringExact(updatedName),
 					),
 				},
 			},
 			{
-				Config: testAccSshKeyResourceKeyUpdate,
+				Config: testAccSshKeyResourceConfig(updatedName, updatedPublicKey),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrWith("oneprovider_ssh_key.key", "id", func(value string) error {
 						if value == initialID {
@@ -87,12 +80,12 @@ func TestAccSshKeyResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_ssh_key.key",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("frodosnewhouse"),
+						knownvalue.StringExact(updatedName),
 					),
 					statecheck.ExpectKnownValue(
 						"oneprovider_ssh_key.key",
 						tfjsonpath.New("public_key"),
-						knownvalue.StringExact("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMbAn3/YgZhhmsQIiGjOPOhODxpKXUo+LF3rFBvOOnYw"),
+						knownvalue.StringExact(updatedPublicKey),
 					),
 				},
 			},

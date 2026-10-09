@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -16,27 +17,18 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-const testAccVmInstanceResource = `
+func testAccVmInstanceResourceConfig(hostname string) string {
+	return fmt.Sprintf(`
 data "oneprovider_vm_size" "small" {name = "devd50c2"}
 data "oneprovider_vm_location" "warsaw" {city = "Warsaw"}
 resource "oneprovider_vm_instance" "ubuntu" {
 	location_id      = data.oneprovider_vm_location.warsaw.id
 	instance_size_id = data.oneprovider_vm_size.small.id
 	template_id      = "1194"
-	hostname         = "ubuntu-test"
+	hostname         = %q
 }
-`
-
-const testAccVmInstanceResourceUpdate = `
-data "oneprovider_vm_size" "small" {name = "devd50c2"}
-data "oneprovider_vm_location" "warsaw" {city = "Warsaw"}
-resource "oneprovider_vm_instance" "ubuntu" {
-	location_id      = data.oneprovider_vm_location.warsaw.id
-	instance_size_id = data.oneprovider_vm_size.small.id
-	template_id      = "1194"
-	hostname         = "ubuntu-test-updated"
+`, hostname)
 }
-`
 
 func TestAccVmInstanceResource_removedOutOfBand(t *testing.T) {
 	var vmID string
@@ -46,7 +38,7 @@ func TestAccVmInstanceResource_removedOutOfBand(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccVmInstanceResource,
+				Config: testAccVmInstanceResourceConfig(testAccRandomName()),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrWith("oneprovider_vm_instance.ubuntu", "id", func(value string) error {
 						vmID = value
@@ -96,13 +88,16 @@ func TestAccVmInstanceResource_removedOutOfBand(t *testing.T) {
 }
 
 func TestAccVmInstanceResource(t *testing.T) {
+	hostname := testAccRandomName()
+	updatedHostname := testAccRandomName()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccVmInstanceResource,
+				Config: testAccVmInstanceResourceConfig(hostname),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
@@ -137,17 +132,17 @@ func TestAccVmInstanceResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("hostname"),
-						knownvalue.StringExact("ubuntu-test"),
+						knownvalue.StringExact(hostname),
 					),
 				},
 			},
 			{
-				Config: testAccVmInstanceResourceUpdate,
+				Config: testAccVmInstanceResourceConfig(updatedHostname),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
 						tfjsonpath.New("hostname"),
-						knownvalue.StringExact("ubuntu-test-updated"),
+						knownvalue.StringExact(updatedHostname),
 					),
 					statecheck.ExpectKnownValue(
 						"oneprovider_vm_instance.ubuntu",
