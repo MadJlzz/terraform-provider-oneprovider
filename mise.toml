@@ -1,5 +1,6 @@
 [tools]
 go = "1.27.2"
+golangci-lint = "2.14"
 
 [env]
 _.file = '.env'
