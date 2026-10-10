@@ -83,7 +83,9 @@ func waitForVMReady(ctx context.Context, timeout time.Duration, id vm.APIID, get
 	return retry.RetryContext(ctx, timeout, func() *retry.RetryError {
 		info, infoErr := get(ctx, instanceID)
 		if infoErr != nil {
-			return retry.NonRetryableError(infoErr)
+			// The VM was just created with the same credentials, so a failing /vm/info call is most
+			// likely a transient API or network issue. Keep polling until the timeout expires.
+			return retry.RetryableError(fmt.Errorf("unable to read vm instance %s: %w", instanceID, infoErr))
 		}
 		if info.Response.ServerInstall || strings.ToLower(info.Response.ServerState.State) == "offline" {
 			return retry.RetryableError(fmt.Errorf("vm instance not ready yet"))
@@ -259,6 +261,16 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
+	data.ID = types.StringValue(responseID)
+	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
+	data.Password = types.StringValue(vmInstance.Response.Password)
+
+	// Persist the VM in state before waiting for it to be ready.
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	createTimeout, diags := data.Timeouts.Create(ctx, 5*time.Minute)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -268,20 +280,16 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	err = waitForVMReady(ctx, createTimeout, vmInstance.Response.Id, r.svc.VM.GetInstanceByID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to refresh resource",
-			"An unexpected error occurred while attempting to refresh the resource."+
-				"Please retry the operation or report this issue to the provider developers.\n\n"+
-				err.Error(),
+			"VM instance did not become ready",
+			fmt.Sprintf(
+				"VM instance %s was created but did not become ready within %s. "+
+					"It has been saved to the state and marked as tainted, so it will be replaced on the next apply. "+
+					"Consider increasing the create timeout using the timeouts block.\n\n%s",
+				responseID, createTimeout, err.Error(),
+			),
 		)
 		return
 	}
-
-	// Set the value for computed attributes.
-	data.ID = types.StringValue(responseID)
-	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
-	data.Password = types.StringValue(vmInstance.Response.Password)
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
