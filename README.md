@@ -12,8 +12,10 @@ Terraform provider for OneProvider. Provider documentation is available [here](h
 
 ### Requirements
 
-- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.12
-- [Go](https://golang.org/doc/install) >= 1.24
+- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.16
+- [Go](https://golang.org/doc/install) >= 1.27
+
+Exact tool versions are pinned in `mise.toml`. If you use [mise](https://mise.jdx.dev), run `mise install` to get them.
 
 ### Developing the provider
 
