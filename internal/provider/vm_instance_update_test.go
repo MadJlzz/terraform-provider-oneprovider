@@ -27,7 +27,7 @@ func TestUpdateVMHostnameRetriesWhileLockedAndWaitsForHostname(t *testing.T) {
 		func(context.Context, *vm.InstanceHostnameUpdateRequest) error {
 			updateCalls++
 			if updateCalls < 3 {
-				return apiError(apiErrVMLocked, "VPS Locked")
+				return apiError(apiErrOperationFailed, "VPS Locked")
 			}
 			return nil
 		},
@@ -55,14 +55,14 @@ func TestUpdateVMHostnameFailsFastOnOtherErrors(t *testing.T) {
 	err := updateVMHostname(context.Background(), 10*time.Second, hostnameUpdateRequest(),
 		func(context.Context, *vm.InstanceHostnameUpdateRequest) error {
 			updateCalls++
-			return apiError(1, "invalid hostname")
+			return apiError(apiErrOperationFailed, "Operation not performed")
 		},
 		func(context.Context, string) (*vm.InstanceReadResponse, error) {
 			t.Fatal("updateVMHostname() polled the VM after a failed update")
 			return nil, nil
 		},
 	)
-	if err == nil || !strings.Contains(err.Error(), "invalid hostname") {
+	if err == nil || !strings.Contains(err.Error(), "Operation not performed") {
 		t.Fatalf("updateVMHostname() error = %v, want the API error", err)
 	}
 	if updateCalls != 1 {
@@ -73,7 +73,7 @@ func TestUpdateVMHostnameFailsFastOnOtherErrors(t *testing.T) {
 func TestUpdateVMHostnameTimesOutWhileLocked(t *testing.T) {
 	err := updateVMHostname(context.Background(), time.Second, hostnameUpdateRequest(),
 		func(context.Context, *vm.InstanceHostnameUpdateRequest) error {
-			return apiError(apiErrVMLocked, "VPS Locked")
+			return apiError(apiErrOperationFailed, "VPS Locked")
 		},
 		func(context.Context, string) (*vm.InstanceReadResponse, error) {
 			t.Fatal("updateVMHostname() polled the VM while it was still locked")
@@ -81,7 +81,7 @@ func TestUpdateVMHostnameTimesOutWhileLocked(t *testing.T) {
 		},
 	)
 	var apiErr *client.APIError
-	if !errors.As(err, &apiErr) || apiErr.Code != apiErrVMLocked {
+	if !errors.As(err, &apiErr) || apiErr.Code != apiErrOperationFailed {
 		t.Fatalf("updateVMHostname() error = %v, want the last VPS Locked error", err)
 	}
 }
