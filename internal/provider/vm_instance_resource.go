@@ -100,6 +100,96 @@ func waitForVMReady(ctx context.Context, timeout time.Duration, id vm.APIID, get
 	})
 }
 
+const (
+	// apiErrVMLocked is returned while a task (install, hostname change, ...) still holds the VM.
+	apiErrVMLocked = 42
+	// apiErrVMNotFound is returned when the VM does not exist (anymore).
+	apiErrVMNotFound = 810
+)
+
+func isAPIError(err error, code int) bool {
+	var apiErr *client.APIError
+	return errors.As(err, &apiErr) && apiErr.Code == code
+}
+
+type instanceDestroyer func(context.Context, *vm.InstanceDestroyRequest) error
+
+func destroyVM(ctx context.Context, timeout time.Duration, instanceID string, destroy instanceDestroyer, get instanceInfoGetter) error {
+	destroyRequest := &vm.InstanceDestroyRequest{
+		VmId:         instanceID,
+		ConfirmClose: true,
+	}
+
+	deadline := time.Now().Add(timeout)
+
+	err := retry.RetryContext(ctx, timeout, func() *retry.RetryError {
+		err := destroy(ctx, destroyRequest)
+		switch {
+		case err == nil, isAPIError(err, apiErrVMNotFound):
+			return nil
+		case isAPIError(err, apiErrVMLocked):
+			// The VM is busy with another task; the lock is released once that task completes.
+			return retry.RetryableError(err)
+		default:
+			return retry.NonRetryableError(err)
+		}
+	})
+	if err != nil {
+		return err
+	}
+
+	// The destroy request is asynchronous: wait until the API stops returning the VM so it is
+	// only removed from the state once it is really gone.
+	return retry.RetryContext(ctx, time.Until(deadline), func() *retry.RetryError {
+		_, infoErr := get(ctx, instanceID)
+		if isAPIError(infoErr, apiErrVMNotFound) {
+			return nil
+		}
+		if infoErr != nil {
+			return retry.RetryableError(fmt.Errorf("unable to read vm instance %s: %w", instanceID, infoErr))
+		}
+		return retry.RetryableError(fmt.Errorf("vm instance %s not destroyed yet", instanceID))
+	})
+}
+
+type instanceHostnameUpdater func(context.Context, *vm.InstanceHostnameUpdateRequest) error
+
+func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.InstanceHostnameUpdateRequest, update instanceHostnameUpdater, get instanceInfoGetter) error {
+	deadline := time.Now().Add(timeout)
+
+	err := retry.RetryContext(ctx, timeout, func() *retry.RetryError {
+		err := update(ctx, req)
+		switch {
+		case err == nil:
+			return nil
+		case isAPIError(err, apiErrVMLocked):
+			// The VM is busy with another task (e.g. post-install); the lock is released once it completes.
+			return retry.RetryableError(err)
+		default:
+			return retry.NonRetryableError(err)
+		}
+	})
+	if err != nil {
+		return err
+	}
+
+	// OneProvider backend needs time to apply changes, so wait until the new hostname is visible.
+	err = retry.RetryContext(ctx, time.Until(deadline), func() *retry.RetryError {
+		info, infoErr := get(ctx, req.VmId)
+		if infoErr != nil {
+			return retry.NonRetryableError(infoErr)
+		}
+		if info.Response.ServerInfo.Hostname != req.Hostname {
+			return retry.RetryableError(fmt.Errorf("vm instance hostname not updated yet"))
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("hostname update was accepted but could not be confirmed: %w", err)
+	}
+	return nil
+}
+
 func NewVmInstanceResource() resource.Resource {
 	return &vmInstanceResource{}
 }
@@ -180,6 +270,7 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
 				Create: true,
 				Update: true,
+				Delete: true,
 			}),
 		},
 	}
@@ -301,8 +392,7 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	info, err := r.svc.VM.GetInstanceByID(ctx, data.ID.ValueString())
 	if err != nil {
-		var apiErr *client.APIError
-		if errors.As(err, &apiErr) && apiErr.Code == 810 {
+		if isAPIError(err, apiErrVMNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -401,37 +491,17 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 			Hostname: plan.Hostname.ValueString(),
 		}
 
-		err := r.svc.VM.UpdateInstanceHostname(ctx, updateRequest)
-		if err != nil {
-			resp.Diagnostics.AddError(
-				"Unable to update resource",
-				"An unexpected error occurred while attempting to update the resource."+
-					"Please retry the operation or report this issue to the provider developers.\n\n"+
-					err.Error(),
-			)
-			return
-		}
-
 		updateTimeout, diags := plan.Timeouts.Update(ctx, 30*time.Second)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return
 		}
 
-		err = retry.RetryContext(ctx, updateTimeout, func() *retry.RetryError {
-			info, infoErr := r.svc.VM.GetInstanceByID(ctx, plan.ID.ValueString())
-			if infoErr != nil {
-				return retry.NonRetryableError(infoErr)
-			}
-			if info.Response.ServerInfo.Hostname != plan.Hostname.ValueString() {
-				return retry.RetryableError(fmt.Errorf("vm instance hostname not updated yet"))
-			}
-			return nil
-		})
+		err := updateVMHostname(ctx, updateTimeout, updateRequest, r.svc.VM.UpdateInstanceHostname, r.svc.VM.GetInstanceByID)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				"Unable to refresh resource after update",
-				"The update succeeded but failed to refresh the resource state."+
+				"Unable to update resource",
+				"An unexpected error occurred while attempting to update the resource."+
 					"Please retry the operation or report this issue to the provider developers.\n\n"+
 					err.Error(),
 			)
@@ -451,17 +521,19 @@ func (r *vmInstanceResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	destroyRequest := &vm.InstanceDestroyRequest{
-		VmId:         data.ID.ValueString(),
-		ConfirmClose: true,
+	deleteTimeout, diags := data.Timeouts.Delete(ctx, 1*time.Minute)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
-	err := r.svc.VM.DestroyInstance(ctx, destroyRequest)
+	err := destroyVM(ctx, deleteTimeout, data.ID.ValueString(), r.svc.VM.DestroyInstance, r.svc.VM.GetInstanceByID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to destroy resource",
 			"An unexpected error occurred while attempting to destroy the resource."+
-				"Please retry the operation or report this issue to the provider developers.\n\n"+
+				"Please retry the operation or report this issue to the provider developers. "+
+				"If the VM is locked by a long-running task, consider increasing the delete timeout using the timeouts block.\n\n"+
 				err.Error(),
 		)
 		return
