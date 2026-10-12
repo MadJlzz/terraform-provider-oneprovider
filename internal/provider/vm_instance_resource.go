@@ -101,8 +101,9 @@ func waitForVMReady(ctx context.Context, timeout time.Duration, id vm.APIID, get
 }
 
 const (
-	// apiErrVMLocked is returned while a task (install, hostname change, ...) still holds the VM.
-	apiErrVMLocked = 42
+	// apiErrOperationFailed is a generic code shared by many failures ("VPS Locked",
+	// "Location not available", "Operation not performed", ...); only the message tells them apart.
+	apiErrOperationFailed = 42
 	// apiErrVMNotFound is returned when the VM does not exist (anymore).
 	apiErrVMNotFound = 810
 )
@@ -110,6 +111,14 @@ const (
 func isAPIError(err error, code int) bool {
 	var apiErr *client.APIError
 	return errors.As(err, &apiErr) && apiErr.Code == code
+}
+
+// isVMLockedError reports whether err is the "VPS Locked" error returned while a task
+// (install, hostname change, ...) still holds the VM.
+func isVMLockedError(err error) bool {
+	var apiErr *client.APIError
+	return errors.As(err, &apiErr) && apiErr.Code == apiErrOperationFailed &&
+		strings.Contains(strings.ToLower(apiErr.Message), "locked")
 }
 
 type instanceDestroyer func(context.Context, *vm.InstanceDestroyRequest) error
@@ -127,7 +136,7 @@ func destroyVM(ctx context.Context, timeout time.Duration, instanceID string, de
 		switch {
 		case err == nil, isAPIError(err, apiErrVMNotFound):
 			return nil
-		case isAPIError(err, apiErrVMLocked):
+		case isVMLockedError(err):
 			// The VM is busy with another task; the lock is released once that task completes.
 			return retry.RetryableError(err)
 		default:
@@ -162,7 +171,7 @@ func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.Instan
 		switch {
 		case err == nil:
 			return nil
-		case isAPIError(err, apiErrVMLocked):
+		case isVMLockedError(err):
 			// The VM is busy with another task (e.g. post-install); the lock is released once it completes.
 			return retry.RetryableError(err)
 		default:
