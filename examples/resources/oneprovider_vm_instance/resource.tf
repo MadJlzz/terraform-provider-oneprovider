@@ -16,9 +16,20 @@ data "oneprovider_vm_location" "paris" {
   city = "Paris"
 }
 
+data "oneprovider_vm_project" "production" {
+  name = "Production"
+}
+
+data "oneprovider_vm_tag" "managed" {
+  name    = "terraform managed"
+  project = data.oneprovider_vm_project.production.id
+}
+
 resource "oneprovider_vm_instance" "vm" {
   location_id      = data.oneprovider_vm_location.paris.id
   instance_size_id = "45"
   template_id      = data.oneprovider_vm_template.ubuntu.id
   hostname         = "theOneRing"
+  project          = data.oneprovider_vm_project.production.id
+  tags             = [data.oneprovider_vm_tag.managed.id]
 }

@@ -80,6 +80,14 @@ func (s *Service) UpdateInstanceHostname(ctx context.Context, req *InstanceHostn
 	return nil
 }
 
+func (s *Service) UpdateInstanceProject(ctx context.Context, req *InstanceProjectUpdateRequest) error {
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/project/assign", strings.NewReader(req.UrlValues().Encode()), nil)
+	if err != nil {
+		return fmt.Errorf("vm: update instance project failed: %w", err)
+	}
+	return nil
+}
+
 func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyRequest) error {
 	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/destroy", strings.NewReader(req.UrlValues().Encode()), nil)
 	if err != nil {

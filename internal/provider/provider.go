@@ -127,6 +127,8 @@ func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource 
 	return []func() resource.Resource{
 		NewVmInstanceResource,
 		NewSSHKeyResource,
+		NewVmTagResource,
+		NewVmProjectResource,
 	}
 }
 
@@ -136,6 +138,8 @@ func (p *OneProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		NewVMLocationDataSource,
 		NewSSHKeyDataSource,
 		NewVmSizeDataSource,
+		NewVmProjectDataSource,
+		NewVmTagDataSource,
 	}
 }
 

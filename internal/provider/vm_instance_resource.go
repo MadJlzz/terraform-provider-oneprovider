@@ -11,13 +11,16 @@ import (
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 )
@@ -38,6 +41,8 @@ type vmInstanceResourceModel struct {
 	InstanceSizeId types.String   `tfsdk:"instance_size_id"`
 	TemplateId     types.String   `tfsdk:"template_id"`
 	Hostname       types.String   `tfsdk:"hostname"`
+	Project        types.String   `tfsdk:"project"`
+	Tags           types.Set      `tfsdk:"tags"`
 	IPAddress      types.String   `tfsdk:"ip_address"`
 	Password       types.String   `tfsdk:"password"`
 	SshKeys        types.List     `tfsdk:"ssh_keys"`
@@ -161,13 +166,9 @@ func destroyVM(ctx context.Context, timeout time.Duration, instanceID string, de
 	})
 }
 
-type instanceHostnameUpdater func(context.Context, *vm.InstanceHostnameUpdateRequest) error
-
-func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.InstanceHostnameUpdateRequest, update instanceHostnameUpdater, get instanceInfoGetter) error {
-	deadline := time.Now().Add(timeout)
-
-	err := retry.RetryContext(ctx, timeout, func() *retry.RetryError {
-		err := update(ctx, req)
+func retryWhileVMLocked(ctx context.Context, timeout time.Duration, update func() error) error {
+	return retry.RetryContext(ctx, timeout, func() *retry.RetryError {
+		err := update()
 		switch {
 		case err == nil:
 			return nil
@@ -178,6 +179,13 @@ func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.Instan
 			return retry.NonRetryableError(err)
 		}
 	})
+}
+
+type instanceHostnameUpdater func(context.Context, *vm.InstanceHostnameUpdateRequest) error
+
+func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.InstanceHostnameUpdateRequest, update instanceHostnameUpdater, get instanceInfoGetter) error {
+	deadline := time.Now().Add(timeout)
+	err := retryWhileVMLocked(ctx, timeout, func() error { return update(ctx, req) })
 	if err != nil {
 		return err
 	}
@@ -237,6 +245,16 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 			"hostname": schema.StringAttribute{
 				Description: "Hostname of the VM instance",
 				Required:    true,
+			},
+			"project": schema.StringAttribute{
+				Description: "UUID of the project for the VM instance. Changing the UUID moves the existing VM without replacing it. Removing this attribute moves the VM to the account's default project.",
+				Optional:    true,
+				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+			},
+			"tags": schema.SetAttribute{
+				Description: "Set of existing tag IDs in the VM's project. When configured, this manages all tag assignments for this VM in that project. Removing the attribute clears previously managed assignments; tags themselves are not deleted.",
+				ElementType: types.StringType,
+				Optional:    true,
 			},
 			"ssh_keys": schema.ListAttribute{
 				Description: "List of SSH keys UUID to add to the VM instance. Note: The OneProvider API does not return SSH key information, so the state reflects the configured values rather than the actual server state.",
@@ -334,6 +352,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		InstanceSizeId: instanceSizeId,
 		TemplateId:     data.TemplateId.ValueString(),
 		Hostname:       data.Hostname.ValueString(),
+		Project:        data.Project.ValueString(),
 		SshKeys:        sshKeys,
 	}
 	vmInstance, err := r.svc.VM.CreateInstance(ctx, createRequest)
@@ -365,6 +384,11 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	data.IPAddress = types.StringValue(vmInstance.Response.IpAddress)
 	data.Password = types.StringValue(vmInstance.Response.Password)
 
+	desiredTags := data.Tags
+	if !desiredTags.IsNull() {
+		data.Tags = types.SetValueMust(types.StringType, nil)
+	}
+
 	// Persist the VM in state before waiting for it to be ready.
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
@@ -390,6 +414,28 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		)
 		return
 	}
+	if !desiredTags.IsNull() {
+		resp.Diagnostics.Append(r.setTags(ctx, data.Project, data.ID, desiredTags)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("tags"), desiredTags)...)
+	}
+}
+
+func (r *vmInstanceResource) setTags(ctx context.Context, project, id types.String, tags types.Set) diag.Diagnostics {
+	var diags diag.Diagnostics
+	var ids []string
+	if !tags.IsNull() {
+		diags.Append(tags.ElementsAs(ctx, &ids, false)...)
+		if diags.HasError() {
+			return diags
+		}
+	}
+	if err := r.svc.Tags.SetInstanceTags(ctx, project.ValueString(), id.ValueString(), ids); err != nil {
+		diags.AddAttributeError(path.Root("tags"), "Unable to update VM tags", err.Error())
+	}
+	return diags
 }
 
 func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -480,6 +526,20 @@ func (r *vmInstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 		data.TemplateId = types.StringValue(ti.Id.String())
 	}
 
+	if !data.Tags.IsNull() {
+		ids, err := r.svc.Tags.GetInstanceTagIDs(ctx, data.Project.ValueString(), data.ID.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(path.Root("tags"), "Unable to refresh VM tags", err.Error())
+			return
+		}
+		tags, diags := types.SetValueFrom(ctx, types.StringType, ids)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		data.Tags = tags
+	}
+
 	data.Hostname = types.StringValue(info.Response.ServerInfo.Hostname)
 	data.IPAddress = types.StringValue(info.Response.ServerInfo.IpAddress)
 
@@ -492,18 +552,21 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 
 	var plan *vmInstanceResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	// We are updating the hostname...
+	updateTimeout, diags := plan.Timeouts.Update(ctx, 30*time.Second)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	deadline := time.Now().Add(updateTimeout)
+
 	if state.Hostname != plan.Hostname {
 		updateRequest := &vm.InstanceHostnameUpdateRequest{
 			VmId:     plan.ID.ValueString(),
 			Hostname: plan.Hostname.ValueString(),
-		}
-
-		updateTimeout, diags := plan.Timeouts.Update(ctx, 30*time.Second)
-		resp.Diagnostics.Append(diags...)
-		if resp.Diagnostics.HasError() {
-			return
 		}
 
 		err := updateVMHostname(ctx, updateTimeout, updateRequest, r.svc.VM.UpdateInstanceHostname, r.svc.VM.GetInstanceByID)
@@ -516,7 +579,49 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 			)
 			return
 		}
-		plan.Hostname = types.StringValue(updateRequest.Hostname)
+	}
+
+	projectChanged := !state.Project.Equal(plan.Project)
+	if projectChanged {
+		projectUuid := plan.Project.ValueString()
+		if plan.Project.IsNull() {
+			project, err := r.svc.Projects.GetDefault(ctx)
+			if err != nil {
+				resp.Diagnostics.AddAttributeError(path.Root("project"), "Unable to find default VM project", err.Error())
+				return
+			}
+			projectUuid = project.Uuid
+		}
+		// Tags belong to a project. Detach managed old-project tags before moving the VM.
+		if !state.Tags.IsNull() {
+			resp.Diagnostics.Append(r.setTags(ctx, state.Project, state.ID, types.SetNull(types.StringType))...)
+			if resp.Diagnostics.HasError() {
+				return
+			}
+		}
+		updateRequest := &vm.InstanceProjectUpdateRequest{
+			InstanceId:  state.ID.ValueString(),
+			ProjectUuid: projectUuid,
+		}
+		err := retryWhileVMLocked(ctx, time.Until(deadline), func() error {
+			return r.svc.VM.UpdateInstanceProject(ctx, updateRequest)
+		})
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(path.Root("project"), "Unable to update VM project", err.Error())
+			return
+		}
+		// A subsequent tag failure must not leave refresh looking in the old project.
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project"), plan.Project)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	if (!projectChanged && !state.Tags.Equal(plan.Tags)) || (projectChanged && !plan.Tags.IsNull()) {
+		resp.Diagnostics.Append(r.setTags(ctx, plan.Project, state.ID, plan.Tags)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)

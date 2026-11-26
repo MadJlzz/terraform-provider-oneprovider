@@ -171,6 +171,7 @@ type InstanceCreateRequest struct {
 	InstanceSizeId int      `json:"instance_size"`
 	TemplateId     string   `json:"template"`
 	Hostname       string   `json:"hostname"`
+	Project        string   `json:"project"`
 	SshKeys        []string `json:"ssh_keys"`
 }
 
@@ -180,6 +181,9 @@ func (v *InstanceCreateRequest) UrlValues() url.Values {
 		"instance_size": {strconv.Itoa(v.InstanceSizeId)},
 		"template":      {v.TemplateId},
 		"hostname":      {v.Hostname},
+	}
+	if v.Project != "" {
+		urlValues.Set("project", v.Project)
 	}
 	for idx, key := range v.SshKeys {
 		urlValues.Add(fmt.Sprintf("ssh_keys[%d]", idx), key)
@@ -206,6 +210,18 @@ func (v *InstanceHostnameUpdateRequest) UrlValues() url.Values {
 	return url.Values{
 		"vm_id":    {v.VmId},
 		"hostname": {v.Hostname},
+	}
+}
+
+type InstanceProjectUpdateRequest struct {
+	InstanceId  string `json:"instance_id"`
+	ProjectUuid string `json:"project_uuid"`
+}
+
+func (v *InstanceProjectUpdateRequest) UrlValues() url.Values {
+	return url.Values{
+		"instance_id":  {v.InstanceId},
+		"project_uuid": {v.ProjectUuid},
 	}
 }
 
