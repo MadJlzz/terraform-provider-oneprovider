@@ -35,12 +35,18 @@ data "oneprovider_vm_project" "production" {
   name = "Production"
 }
 
+data "oneprovider_vm_tag" "managed" {
+  name    = "terraform managed"
+  project = data.oneprovider_vm_project.production.id
+}
+
 resource "oneprovider_vm_instance" "vm" {
   location_id      = data.oneprovider_vm_location.paris.id
   instance_size_id = "45"
   template_id      = data.oneprovider_vm_template.ubuntu.id
   hostname         = "theOneRing"
   project          = data.oneprovider_vm_project.production.id
+  tags             = [data.oneprovider_vm_tag.managed.id]
 }
 ```
 
@@ -58,6 +64,7 @@ resource "oneprovider_vm_instance" "vm" {
 
 - `project` (String) UUID of the project for the VM instance. Changing the UUID moves the existing VM without replacing it. Removing this attribute moves the VM to the account's default project.
 - `ssh_keys` (List of String) List of SSH keys UUID to add to the VM instance. Note: The OneProvider API does not return SSH key information, so the state reflects the configured values rather than the actual server state.
+- `tags` (Set of String) Set of existing tag IDs in the VM's project. When configured, this manages all tag assignments for this VM in that project. Removing the attribute clears previously managed assignments; tags themselves are not deleted.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only

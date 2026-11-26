@@ -3,12 +3,14 @@ package oneprovider
 import (
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/ssh"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/tags"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 )
 
 type Service struct {
-	VM  *vm.Service
-	SSH *ssh.Service
+	VM   *vm.Service
+	SSH  *ssh.Service
+	Tags *tags.Service
 }
 
 func NewService(endpoint, apiKey, clientKey string) (*Service, error) {
@@ -16,8 +18,10 @@ func NewService(endpoint, apiKey, clientKey string) (*Service, error) {
 	if err != nil {
 		return nil, err
 	}
+	vmService := vm.NewService(c)
 	return &Service{
-		VM:  vm.NewService(c),
-		SSH: ssh.NewService(c),
+		VM:   vmService,
+		SSH:  ssh.NewService(c),
+		Tags: tags.NewService(c, vmService),
 	}, nil
 }
