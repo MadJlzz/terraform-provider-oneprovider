@@ -11,6 +11,7 @@ import (
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -18,6 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 )
@@ -38,6 +40,7 @@ type vmInstanceResourceModel struct {
 	InstanceSizeId types.String   `tfsdk:"instance_size_id"`
 	TemplateId     types.String   `tfsdk:"template_id"`
 	Hostname       types.String   `tfsdk:"hostname"`
+	Project        types.String   `tfsdk:"project"`
 	IPAddress      types.String   `tfsdk:"ip_address"`
 	Password       types.String   `tfsdk:"password"`
 	SshKeys        types.List     `tfsdk:"ssh_keys"`
@@ -161,13 +164,9 @@ func destroyVM(ctx context.Context, timeout time.Duration, instanceID string, de
 	})
 }
 
-type instanceHostnameUpdater func(context.Context, *vm.InstanceHostnameUpdateRequest) error
-
-func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.InstanceHostnameUpdateRequest, update instanceHostnameUpdater, get instanceInfoGetter) error {
-	deadline := time.Now().Add(timeout)
-
-	err := retry.RetryContext(ctx, timeout, func() *retry.RetryError {
-		err := update(ctx, req)
+func retryWhileVMLocked(ctx context.Context, timeout time.Duration, update func() error) error {
+	return retry.RetryContext(ctx, timeout, func() *retry.RetryError {
+		err := update()
 		switch {
 		case err == nil:
 			return nil
@@ -178,6 +177,13 @@ func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.Instan
 			return retry.NonRetryableError(err)
 		}
 	})
+}
+
+type instanceHostnameUpdater func(context.Context, *vm.InstanceHostnameUpdateRequest) error
+
+func updateVMHostname(ctx context.Context, timeout time.Duration, req *vm.InstanceHostnameUpdateRequest, update instanceHostnameUpdater, get instanceInfoGetter) error {
+	deadline := time.Now().Add(timeout)
+	err := retryWhileVMLocked(ctx, timeout, func() error { return update(ctx, req) })
 	if err != nil {
 		return err
 	}
@@ -237,6 +243,11 @@ func (r *vmInstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 			"hostname": schema.StringAttribute{
 				Description: "Hostname of the VM instance",
 				Required:    true,
+			},
+			"project": schema.StringAttribute{
+				Description: "UUID of the project for the VM instance. Changing the UUID moves the existing VM without replacing it. Removing this attribute moves the VM to the account's default project.",
+				Optional:    true,
+				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 			},
 			"ssh_keys": schema.ListAttribute{
 				Description: "List of SSH keys UUID to add to the VM instance. Note: The OneProvider API does not return SSH key information, so the state reflects the configured values rather than the actual server state.",
@@ -334,6 +345,7 @@ func (r *vmInstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		InstanceSizeId: instanceSizeId,
 		TemplateId:     data.TemplateId.ValueString(),
 		Hostname:       data.Hostname.ValueString(),
+		Project:        data.Project.ValueString(),
 		SshKeys:        sshKeys,
 	}
 	vmInstance, err := r.svc.VM.CreateInstance(ctx, createRequest)
@@ -492,18 +504,21 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 
 	var plan *vmInstanceResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	// We are updating the hostname...
+	updateTimeout, diags := plan.Timeouts.Update(ctx, 30*time.Second)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	deadline := time.Now().Add(updateTimeout)
+
 	if state.Hostname != plan.Hostname {
 		updateRequest := &vm.InstanceHostnameUpdateRequest{
 			VmId:     plan.ID.ValueString(),
 			Hostname: plan.Hostname.ValueString(),
-		}
-
-		updateTimeout, diags := plan.Timeouts.Update(ctx, 30*time.Second)
-		resp.Diagnostics.Append(diags...)
-		if resp.Diagnostics.HasError() {
-			return
 		}
 
 		err := updateVMHostname(ctx, updateTimeout, updateRequest, r.svc.VM.UpdateInstanceHostname, r.svc.VM.GetInstanceByID)
@@ -516,7 +531,29 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 			)
 			return
 		}
-		plan.Hostname = types.StringValue(updateRequest.Hostname)
+	}
+
+	if !state.Project.Equal(plan.Project) {
+		projectUuid := plan.Project.ValueString()
+		if plan.Project.IsNull() {
+			project, err := r.svc.VM.GetDefaultProject(ctx)
+			if err != nil {
+				resp.Diagnostics.AddAttributeError(path.Root("project"), "Unable to find default VM project", err.Error())
+				return
+			}
+			projectUuid = project.Uuid
+		}
+		updateRequest := &vm.InstanceProjectUpdateRequest{
+			InstanceId:  state.ID.ValueString(),
+			ProjectUuid: projectUuid,
+		}
+		err := retryWhileVMLocked(ctx, time.Until(deadline), func() error {
+			return r.svc.VM.UpdateInstanceProject(ctx, updateRequest)
+		})
+		if err != nil {
+			resp.Diagnostics.AddAttributeError(path.Root("project"), "Unable to update VM project", err.Error())
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)

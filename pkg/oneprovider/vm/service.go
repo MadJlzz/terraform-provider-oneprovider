@@ -80,12 +80,59 @@ func (s *Service) UpdateInstanceHostname(ctx context.Context, req *InstanceHostn
 	return nil
 }
 
+func (s *Service) UpdateInstanceProject(ctx context.Context, req *InstanceProjectUpdateRequest) error {
+	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/project/assign", strings.NewReader(req.UrlValues().Encode()), nil)
+	if err != nil {
+		return fmt.Errorf("vm: update instance project failed: %w", err)
+	}
+	return nil
+}
+
 func (s *Service) DestroyInstance(ctx context.Context, req *InstanceDestroyRequest) error {
 	err := s.client.MakeAPICall(ctx, http.MethodPost, "/vm/destroy", strings.NewReader(req.UrlValues().Encode()), nil)
 	if err != nil {
 		return fmt.Errorf("vm: destroy instance failed: %w", err)
 	}
 	return nil
+}
+
+func (s *Service) listProjects(ctx context.Context) ([]ProjectReadResponse, error) {
+	var response ProjectsListResponse
+	err := s.client.MakeAPICall(ctx, http.MethodGet, "/vm/project/list", nil, &response)
+	if err != nil {
+		return nil, fmt.Errorf("vm: list projects failed: %w", err)
+	}
+	return response.Response.Projects, nil
+}
+
+func (s *Service) GetDefaultProject(ctx context.Context) (*ProjectReadResponse, error) {
+	projects, err := s.listProjects(ctx)
+	if err != nil {
+		return nil, err
+	}
+	findDefaultFn := func(p ProjectReadResponse) bool { return p.IsDefault == 1 }
+	project, found := common.FindElement(projects, findDefaultFn)
+	if !found {
+		return nil, fmt.Errorf("vm: default project not found")
+	}
+	if project.Uuid == "" {
+		return nil, fmt.Errorf("vm: default project has an empty UUID")
+	}
+	return &project, nil
+}
+
+func (s *Service) GetProjectByName(ctx context.Context, name string) (*ProjectReadResponse, error) {
+	projects, err := s.listProjects(ctx)
+	if err != nil {
+		return nil, err
+	}
+	findProjectFn := func(p ProjectReadResponse) bool { return p.Name == name }
+	project, found := common.FindElement(projects, findProjectFn)
+	if found {
+		return &project, nil
+	}
+
+	return nil, fmt.Errorf("vm: project not found for name %s", name)
 }
 
 func (s *Service) GetSizeByName(ctx context.Context, name string) (*SizeReadResponse, error) {

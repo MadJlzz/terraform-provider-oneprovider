@@ -16,9 +16,14 @@ data "oneprovider_vm_location" "paris" {
   city = "Paris"
 }
 
+data "oneprovider_vm_project" "production" {
+  name = "Production"
+}
+
 resource "oneprovider_vm_instance" "vm" {
   location_id      = data.oneprovider_vm_location.paris.id
   instance_size_id = "45"
   template_id      = data.oneprovider_vm_template.ubuntu.id
   hostname         = "theOneRing"
+  project          = data.oneprovider_vm_project.production.id
 }
