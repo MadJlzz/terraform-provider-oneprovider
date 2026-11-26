@@ -11,21 +11,22 @@ import (
 
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/common"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/client"
+	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/projects"
 	"github.com/MadJlzz/terraform-provider-oneprovider/pkg/oneprovider/vm"
 )
 
 type Service struct {
-	client *client.Client
-	vm     *vm.Service
+	client   *client.Client
+	projects *projects.Service
 }
 
-func NewService(c *client.Client, vmService *vm.Service) *Service {
-	return &Service{client: c, vm: vmService}
+func NewService(c *client.Client, projectService *projects.Service) *Service {
+	return &Service{client: c, projects: projectService}
 }
 
 func (s *Service) listTags(ctx context.Context, project string) ([]TagReadResponse, error) {
 	if project == "" {
-		p, err := s.vm.GetDefaultProject(ctx)
+		p, err := s.projects.GetDefault(ctx)
 		if err != nil {
 			return nil, err
 		}

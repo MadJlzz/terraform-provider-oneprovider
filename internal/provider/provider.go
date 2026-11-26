@@ -128,6 +128,7 @@ func (p *OneProvider) Resources(ctx context.Context) []func() resource.Resource 
 		NewVmInstanceResource,
 		NewSSHKeyResource,
 		NewVmTagResource,
+		NewVmProjectResource,
 	}
 }
 

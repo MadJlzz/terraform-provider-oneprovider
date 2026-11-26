@@ -237,18 +237,6 @@ func (v *InstanceDestroyRequest) UrlValues() url.Values {
 	}
 }
 
-type ProjectsListResponse struct {
-	Response struct {
-		Projects []ProjectReadResponse `json:"projects"`
-	} `json:"response"`
-}
-
-type ProjectReadResponse struct {
-	Uuid      string `json:"uuid"`
-	Name      string `json:"name"`
-	IsDefault int    `json:"is_default"`
-}
-
 type SizesListResponse struct {
 	Response []SizeReadResponse `json:"response"`
 }

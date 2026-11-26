@@ -57,7 +57,7 @@ func (ds *vmProjectDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 
-	project, err := ds.svc.VM.GetProjectByName(ctx, name)
+	project, err := ds.svc.Projects.GetByName(ctx, name)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to read VM project", err.Error())
 		return

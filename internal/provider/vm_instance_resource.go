@@ -585,7 +585,7 @@ func (r *vmInstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	if projectChanged {
 		projectUuid := plan.Project.ValueString()
 		if plan.Project.IsNull() {
-			project, err := r.svc.VM.GetDefaultProject(ctx)
+			project, err := r.svc.Projects.GetDefault(ctx)
 			if err != nil {
 				resp.Diagnostics.AddAttributeError(path.Root("project"), "Unable to find default VM project", err.Error())
 				return
